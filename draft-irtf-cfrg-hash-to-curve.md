@@ -59,6 +59,17 @@ normative:
       -
         ins: T. Icart
         org: Sagem Securite and Universite du Luxembourg
+  FT12:
+    title: Indifferentiable Hashing to Barreto-Naehrig Curves
+    venue: LATINCRYPT 2012, pages 1-17.
+    target: https://link.springer.com/chapter/10.1007/978-3-642-33481-8_1
+    authors:
+      -
+        ins: Pierre-Alain Fouque
+        org: Ecole Normale Superieure and INRIA Rennes
+      -
+        ins: Mehdi Tibouchi
+        org: NTT Secure Platform Laboratories
   BF01:
     title: Identity-based encryption from the Weil pairing
     authors:
@@ -845,9 +856,101 @@ Steps:
 
 ### Fouque-Tibouchi Method {#ftpairing}
 
-[todo] pairing-friendly curves
 
+The map2curve_ft(alpha) implements the Fouque-Tibouchi method {{FT12}} which
+covers the case of pairing-friendly curves E: y^2=x^3+B.
+Note that for pairing curves the destination group is usually a subgroup of the
+curve, hence, a scalar multiplication by the cofactor will send the point to
+the desired group.
 
+**Preconditions**
+
+This algorithm works for any Weierstrass curve over F_{q} such that A=0, 1+B is
+a non-zero square in the field, and q=7 mod 12 (covering the case q=1 mod 3 not
+handled by Boneh-Franklin's method).
+
+**Examples**
+
+- BN curves
+- KSS curves
+- BLS curves
+
+**Algorithm**: map2curve_ft
+
+Input:
+
+ - alpha: an octet string to be hashed.
+ - A=0,B: the constants from the Weierstrass curve.
+ - s    : a constant equal to sqrt(-3)
+
+Output:
+
+ - (x,y), a point in E.
+
+Operations:
+
+~~~
+1.  Define f(x) = x^3+B
+2.  t = HashToBase(alpha)
+3.  w = (st)/(1+B+t^2)
+4.  x1 = (-1+s)/2-tw
+5.  x2 = -1-x1
+6.  x3 = 1+1/w^2
+7.  e = Legendre(t)
+8.  if f(x1) is square, output (x1, e * sqrt(f(x1)))
+9.  if f(x2) is square, output (x2, e * sqrt(f(x2)))
+10. Output (x3, e * sqrt(f(x3)))
+~~~
+
+**Implementation**
+
+The following procedure implements the Fouque-Tibouchi's algorithm in a
+straight-line fashion.
+
+~~~
+map2curve_ft(alpha)
+
+Input:
+
+  alpha - an octet string to be encoded
+  B     - the constant of the curve
+
+Output:
+
+  (x, y) - a point in E
+
+Precomputations:
+
+1.  c1 = sqrt(-3)           // Field arithmetic
+2.  c2 = (-1+c1)/2          // Field arithmetic
+
+Steps:
+
+1.   u = HashToBase(alpha)  // {0,1}^* -> Fp
+2.  t0 = u^2                // u^2
+3.  t0 = t0+B+1             // u^2+B+1  
+4.  t0 = 1/t0               // 1/(u^2+B+1)
+5.  t0 = t0*u               // u/(u^2+B+1)
+6.  t0 = t0*c1              // sqrt(-3)u/(u^2+B+1)
+7.  x1 = c2-u*t0            // (-1+sqrt(-3))/2-sqrt(-3)u^2/(u^2+B+1)
+8.  x2 = -1-x1
+9.  t1 = t0^2
+10. t1 = 1/t1
+11. x3 = t1+1
+12. fx1 = x1^3+B
+12. fx2 = x2^3+B
+12. s1 = Legendre(fx1)
+13. s2 = Legendre(fx2)
+14.  x = x3
+15.  x = CMOV(x2 ,x, s2>0)  // if s2=1, then x is set to x2
+16.  x = CMOV(x1, x, s1>0)  // if s1=1, then x is set to x1
+17.  y = x^3+B
+18. t2 = Legendre(u)
+19.  y = t2*sqrt(y)         // TODO: determine which root to choose
+20. Output (x, y)
+~~~
+
+Additionally, map2curve_ft(alpha) can return the point (c2, sqrt(1+B)) when u=0.
 
 ## Encodings for Montgomery curves
 
@@ -1096,6 +1199,9 @@ earlier versions of this document.
 * Sharon Goldberg \\
   Boston University \\
   goldbe@cs.bu.edu
+* Ela Lee \\
+  Royal Holloway, University of London \\
+  Ela.Lee.2010@live.rhul.ac.uk
 
 --- back
 
