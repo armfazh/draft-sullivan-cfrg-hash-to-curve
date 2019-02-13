@@ -780,13 +780,73 @@ Steps:
 ~~~
 
 
+### Boneh-Franklin Method {#supersingular}
+
+The map2curve_bf(alpha) implements the Boneh-Franklin method {{BF01}} which
+covers the case of supersingular curves E: y^2=x^3+B.
+
+**Preconditions**
+
+This algorithm works for any Weierstrass curve over F_{q} such that A=0 and
+q=2 mod 3.
+
+**Examples**
+
+- y^2=x^3+1
+
+**Algorithm**: map2curve_bf
+
+Input:
+
+ - alpha: an octet string to be hashed.
+ - A=0,B: the constants from the Weierstrass curve.
+
+Output:
+
+ - (x,y), a point in E.
+
+Operations:
+
+~~~
+1. u = HashToBase(alpha)
+2. x = (u^2-b)^(1/3)
+3. Output (x,u)
+~~~
+
+**Implementation**
+
+The following procedure implements the Boneh-Franklin's algorithm in a
+straight-line fashion.
+
+~~~
+map2curve_bf(alpha)
+
+Input:
+
+  alpha - an octet string to be encoded
+
+Output:
+
+  (x, y) - a point in E
+
+Precomputations:
+
+1.  c = (2p-1)/3           // Integer arithmetic
+
+Steps:
+
+1.  u = HashToBase(alpha)  // {0,1}^* -> Fp
+2. t0 = u^2                // t0 = u^2
+3. t1 = t0-B               // t1 = u^2-B
+4.  x = t1^c               // x  = (u^2-B)^(1/3)
+5. Output (x,u)
+~~~
+
+
 ### Fouque-Tibouchi Method {#ftpairing}
 
 [todo] pairing-friendly curves
 
-### Boneh-Franklin Method {#supersingular}
-
-[todo] supersingular curves
 
 
 ## Encodings for Montgomery curves
