@@ -1,6 +1,6 @@
 from hacspec.speclib import *
 
-prime = 2**384 - 2**128 - 2**96 + 2**32 - 1
+prime = 2**250*3**159-1
 
 felem_t = refine_t(nat_t, lambda x: x < prime)
 affine_t = tuple2(felem_t, felem_t)
@@ -39,12 +39,12 @@ def fexp(x: felem_t, n: nat_t) -> felem_t:
 def finv(x: felem_t) -> felem_t:
     return to_felem(pow(x, prime-2, prime))
 
-a384 = to_felem(0)
-b384 = to_felem(1)
+a503 = to_felem(0)
+b503 = to_felem(1)
 
 @typechecked
-def map2p384(u:felem_t) -> affine_t:
+def map2p503(u:felem_t) -> affine_t:
     t0 = fsqr(u)
-    t1 = fsub(t0,b384)
+    t1 = fsub(t0,b503)
     x = fexp(t1, (2 * prime - 1) // 3)
     return (x, u)
