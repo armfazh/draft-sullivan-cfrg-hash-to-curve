@@ -1,52 +1,50 @@
 import hashlib
-import struct
+from utils import *
 
-# Curve25519
-p = 2**255 - 19
-F = GF(p)
-A = 486662
-B = 1
+# Format the input as `"h2b" || label || len(x) || x` (where || is concatenation)
+# Since label is a fixed string, and len(x) is fixed to 4 bytes,
+# this encoding is unambiguous
+def format_input(label, x):
+    return "h2b%s%s%s" % (label, i2osp(len(x), 4), x)
 
-# Curve448
-# p = 2^448 - 2^224 - 1
-# F = GF(p)
-# A = 156326
-
-prime = p
-H = hashlib.sha512
-hbits = 512
-assert hbits >= floor(log(p, 2).n()) + 2
-label = "H2C-Curve25519-SHA512-Elligator2-Clear".encode()
-
-def hash_to_base(x, i):
-    i =  i2osp(i, 4) # interpret i as a 4-byte le unsigned integer
-    xin = "h2c".encode() + label + i + x # concatenate inputs
+# Hash bytestring input to a field element.
+def hash_to_base(x, H, hbits, p, label):
+    assert type(x) is bytes
+    F = GF(p)
+    min_bits = floor(log(p, 2).n()) + 1
+    assert hbits >= min_bits, "Need at least %d bits to hash p. H only outputs %d" % (min_bits, hbits)
+    xin = format_input(label, x) # concatenate inputs
     h = H()
     h.update(xin)
     t1 = h.digest()
     t1 = os2ip(t1) # recover integer from hash output
-    s = t1 >> (hbits - 1)
-    t2 = t1 & ((1 << (hbits - 1)) - 1)
+    # s = t1 >> (hbits - 1)
+    t2 = t1 & ((1 << hbits) - 1)
     t3 = ZZ(t2)
-    y = t3 % prime
-    return (F(y), s)
+    y = t3 % p
+    return F(y)
 
-# Convert an non-negative integer into n bytes
-def i2osp(i, n):
-    res = [0]*n
-    for idx in range(n-1, -1, -1):
-        res[idx] = i & 0xff
-        i = i >> 8
-    if i > 0:
-        raise ValueError("Integer %s cannot fit into %s bytes" % (i, n))
-    return struct.pack("<" + "B" * n, *res)
+# Helper function to extract parameters from a ciphersuite label
+def h2b_from_label(label, x):
+    cs = Ciphersuite(label)
+    H = cs.hash.H
+    hbits = cs.hash.hbits()
+    p = cs.curve.p
 
-# Convert octal string into to integer
-def os2ip(os):
-    res = 0
-    for (idx, b) in enumerate(struct.unpack("<" + "B" * len(os), os)):
-        res = res << 8
-        res += b
-    return res
+    value = hash_to_base(x, H, hbits, p, label)
+    if len(x) == 0 and DEBUG:
+        print("hash2base('" + label + "', nil ) = \n\t" + str(value))
+    elif DEBUG:
+        print("hash2base('" + label + "', " + pprint_hex(x) + ") = \n\t" + str(value))
+    return value
 
-print("HashToBase(\"%s\", %s) = %s" % ("test", 0, hash_to_base("test", 0)))
+if __name__ == "__main__":
+    print "## Sample hash2base"
+    print ""
+
+    DEBUG = False
+    print "~~~"
+    print("hash2base(\"%s\", %s) \n\t= %s\n" % ("H2C-Curve25519-SHA256-Elligator-Clear", pprint_hex("\x12\x34"), Hex(h2b_from_label("H2C-Curve25519-SHA256-Elligator-Clear", "\x12\x34"))))
+    print("hash2base(\"%s\", %s) \n\t= %s\n" % ("H2C-P256-SHA512-SWU-", pprint_hex("\x12\x34"), Hex(h2b_from_label("H2C-P256-SHA512-SWU-", "\x12\x34"))))
+    print("hash2base(\"%s\", %s) \n\t= %s\n" % ("H2C-P256-SHA512-SSWU-", pprint_hex("\x12\x34"), Hex(h2b_from_label("H2C-P256-SHA512-SSWU-", "\x12\x34"))))
+    print "~~~"
