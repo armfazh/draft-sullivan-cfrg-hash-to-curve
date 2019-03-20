@@ -2,56 +2,6 @@ load("primes.sage")
 
 Hex = lambda x: map(hex,map(int,x))
 
-def my_abs(a):
-    lim = (p-1)//2
-    if ZZ(a) > ZZ(lim):
-        a = -a
-    return a
-
-def my_sqrt(a):
-    sqrt_of_minusone = F(0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0)
-    exp = ZZ( (p+3)//8 )
-    b = a**exp
-    if b**2 != a:
-        # print("case neg\n")
-        b = b*sqrt_of_minusone
-    # print("root: ",hex(int(b)))
-    return my_abs(b)
-
-
-def my_elligator2(r,u):
-    v = -A/(1+u*r**2)
-    e = legendre_symbol(v**3+A*v**2+B*v,p)
-    # print("case e=%+d\n"%e)
-    x = e*v-(1-e)*A/F(2)
-    y = -e*my_sqrt(x**3+A*x**2+B*x)
-    return E([x,y])
-
-def ell2curve255(r):
-    sqrt_of_minusone = F(0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0)
-    u = F(2)
-    v = -A/(1+u*r**2)
-    l = v**3+A*v**2+B*v
-    power = l**ZZ(((p+3)//8))
-    if power**4 == l**2 :
-        # print("case e=+1\n")
-        x = v
-        y = power
-        if power**2 != l:
-            # print("case e=+1 neg\n")
-            y = y*sqrt_of_minusone
-        y = -my_abs(y)
-    else:
-        # print("case e=-1\n")
-        x = v*u*r**2
-        l = l*u*r**2
-        y = power*r*u**ZZ((p+3)//8)
-        if y**2 != l:
-            # print("case e=-1 neg\n")
-            y = y*sqrt_of_minusone
-        y = my_abs(y)
-    return E([x,y])
-
 
 def my_swu(t,u):
     x1 = u
@@ -131,8 +81,6 @@ def my_sswu_opt(u):
         x = -u**2*x
         y = (F(-1)**((p+1)//4))*legendre_symbol(u,p)*u**3*y
     return E([x,y])
-
-
 
 def my_icart(u):
     v = (3*A-u**4)/(6*u)

@@ -1,16 +1,16 @@
 # Curve25519
-#p = 2**255 - 19
-#F = GF(p)
-#A = F(486662)
-#B = F(1)
-#u = F(2)
+p = 2**255 - 19
+F = GF(p)
+A = F(486662)
+B = F(1)
+u = F(2)
 
 # Curve448
-p = 2**448 - 2**224 - 1
-F = GF(p)
-A = F(156326)
-B = F(1)
-u = F(-1)
+# p = 2**448 - 2**224 - 1
+# F = GF(p)
+# A = F(156326)
+# B = F(1)
+# u = F(-1)
 
 E = EllipticCurve(F, [0, A, 0, B, 0])
 
@@ -31,7 +31,7 @@ def elligator2(alpha):
     x = -A / (1 + (u * r^2))
     y = curve(x)
     if y.is_square(): # is this point square?
-        y = y.square_root()
+        y = -y.square_root()
     else:
         x = (-A * u * r^2) / (1 + (u * r^2))
         y = curve(x).square_root()
@@ -62,7 +62,7 @@ def elligator2_legendre(alpha):
 
     uu = uu - v
 
-    return E(uu, curve(uu).square_root())
+    return E(uu, -e * curve(uu).square_root())
 
 def elligator2_legendre_ct(alpha):
     r = F(alpha)
@@ -93,7 +93,7 @@ def elligator2_legendre_ct(alpha):
 
     uu = v - v2
 
-    return E(uu, curve(uu).square_root())
+    return E(uu, -e * curve(uu).square_root())
 
 inputs = [1, 7, 13, 1<<7, 1<<8, 1<<64, 1<<64-1, p-1, p+1]
 tts = [(alpha, elligator2(alpha), elligator2_legendre(alpha), elligator2_legendre_ct(alpha)) for alpha in inputs]
