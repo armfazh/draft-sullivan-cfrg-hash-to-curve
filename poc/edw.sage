@@ -30,10 +30,11 @@ def isEdwardsPoint(P):
 def areEqual(P,Q):
     x0,y0,t0,z0 = P
     x1,y1,t1,z1 = Q
-    return (x0/z0 == x1/z1) \
-       and (y0/z0 == y1/z1) \
-       and (t0*z0 == x0*y0) \
-       and (t1*z1 == x1*y1)
+    assert isEdwardsPoint(P), "P is not a point in Edw"
+    assert isEdwardsPoint(Q), "Q is not a point in Edw"
+    return (x0*z1 == x1*z0)  \
+       and (y0*z1 == y1*z0)  \
+       and (t0*z1 == t1*z0)
 
 def addEdw(P,Q):
     x1,y1,t1,z1 = P
@@ -117,8 +118,9 @@ def ell2Mon(r):
     return E([x,y])
 
 def ell2MonOpt(r):
-    sqrt_of_minusone = F(0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0)
     u = F(2)
+    sqrt_of_minusone = F(0x2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0)
+    sqrt_of_u = u**ZZ((p+3)//8)
     v = -A/(1+u*r**2)
     l = v**3+A*v**2+B*v
     power = l**ZZ(((p+3)//8))
@@ -134,7 +136,7 @@ def ell2MonOpt(r):
         # print("case e=-1\n")
         x = v*u*r**2
         l = l*u*r**2
-        y = power*r*u**ZZ((p+3)//8)
+        y = power*r*sqrt_of_u
         if y**2 != l:
             # print("case e=-1 neg\n")
             y = y*sqrt_of_minusone
@@ -158,14 +160,13 @@ def ell2EdwOpt(t):
     h = U-W
     return [e*f,g*h,e*h,f*g]
 
-
 inputs = [1, 7, 13, 1<<7, 1<<8, 1<<64, 1<<64-1, p-1, p+1]
 tts = [(alpha, ell2Edw(alpha), ell2EdwOpt(alpha)) for alpha in inputs]
 for pair in tts:
     assert areEqual(pair[1],pair[2]),  "error in ell2edw t:{0}".format(pair[0])
 
 
-for i in range(2**5):
+for i in range(2**10):
     t = F.random_element()
     P0 = ell2Edw(t)
     P1 = ell2EdwOpt(t)
