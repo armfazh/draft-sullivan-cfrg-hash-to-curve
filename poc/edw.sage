@@ -126,24 +126,26 @@ def ell2MonOpt(r):
     power = l**ZZ(((p+3)//8))
     if power**4 == l**2 :
         # print("case e=+1\n")
+        t = power
         x = v
-        y = power
-        if power**2 != l:
+        y = t
+        if t**2 != l:
             # print("case e=+1 neg\n")
             y = y*sqrt_of_minusone
         y = -my_abs(y)
     else:
         # print("case e=-1\n")
+        t = power*sqrt_of_u
+        l = l*u
         x = v*u*r**2
-        l = l*u*r**2
-        y = power*r*sqrt_of_u
-        if y**2 != l:
+        y = t*r
+        if t**2 != l:
             # print("case e=-1 neg\n")
             y = y*sqrt_of_minusone
         y = my_abs(y)
     return E([x,y])
 
-inputs = [1, 7, 13, 1<<7, 1<<8, 1<<64, 1<<64-1, p-1, p+1]
+inputs = [1,2,3,4,5, 7, 13, 1<<7, 1<<8, 1<<64, 1<<64-1, p-1, p+1]
 tts = [(alpha, elligator2(alpha), ell2Mon(alpha), ell2MonOpt(alpha)) for alpha in inputs]
 for pair in tts:
     assert pair[1] == pair[2] == pair[3], "error in ell2mont t:{0}".format(pair[0])
@@ -164,7 +166,6 @@ inputs = [1, 7, 13, 1<<7, 1<<8, 1<<64, 1<<64-1, p-1, p+1]
 tts = [(alpha, ell2Edw(alpha), ell2EdwOpt(alpha)) for alpha in inputs]
 for pair in tts:
     assert areEqual(pair[1],pair[2]),  "error in ell2edw t:{0}".format(pair[0])
-
 
 for i in range(2**10):
     t = F.random_element()
