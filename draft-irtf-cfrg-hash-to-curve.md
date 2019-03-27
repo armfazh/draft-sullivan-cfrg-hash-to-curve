@@ -84,13 +84,13 @@ normative:
     author:
       -
         name: Paulo S. L. M. Barreto
-        org: Escola Politécnica, Universidade de São Paulo, São Paulo, Brazil
+        org: Escola Politecnica, Universidade de Sao Paulo, Sao Paulo, Brazil
       -
         name: Michael Naehrig
-        org: Lehrstuhl für Theoretische Informationstechnik, Rheinisch-Westfälische Technische Hochschule Aachen, Aachen, Germany
+        org: Lehrstuhl fur Theoretische Informationstechnik, Rheinisch-Westfalische Technische Hochschule Aachen, Aachen, Germany
   KSS08:
     title: Constructing Brezing-Weng Pairing-Friendly Elliptic Curves Using Elements in the Cyclotomic Field
-    seriesinfo: Pairing-Based Cryptography – Pairing 2008, pages 126-135
+    seriesinfo: Pairing-Based Cryptography - Pairing 2008, pages 126-135
     DOI: 10.1007/978-3-540-85538-5_9
     target: https://doi.org/10.1007/978-3-540-85538-5_9
     author:
@@ -105,7 +105,7 @@ normative:
         org: School of Computing, Dublin City University, Ireland
   BF01:
     title: Identity-based encryption from the Weil pairing
-    seriesinfo: Advances in Cryptology — CRYPTO 2001, pages 213-229
+    seriesinfo: Advances in Cryptology - CRYPTO 2001, pages 213-229
     target: https://doi.org/10.1007/3-540-44647-8_13
     author:
       -
@@ -137,7 +137,7 @@ normative:
     author:
       -
         name: Paulo S. L. M. Barreto
-        org: Universidade de São Paulo, Brazil
+        org: Universidade de Sao Paulo, Brazil
       -
         name: Ben Lynn
         org: Stanford University
@@ -145,8 +145,8 @@ normative:
         name: Michael Scott
         org: Dublin City University, Ireland
   BMP00:
-    title: Provably secure password-authenticated key exchange using diffie-hellman
-    venue: EUROCRYPT, pages 156–171, 2000.
+    title: Provably secure password-authenticated key exchange using Diffie-Hellman
+    venue: EUROCRYPT, pages 156-171, 2000.
     author:
       -
         ins: Victor Boyko
@@ -166,7 +166,7 @@ normative:
          NIST: FIPS PUB 186-4
   Jablon96:
     title: Strong password-only authenticated key exchange
-    venue: SIGCOMM Comput. Commun. Rev., 26(5), 5–26, 1996.
+    venue: SIGCOMM Comput. Commun. Rev., 26(5), 5-26, 1996.
     authors:
       -
         ins: David P. Jablon
@@ -217,7 +217,7 @@ normative:
         org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
   SW06:
     title: Construction of rational points on elliptic curves over finite fields
-    venue: ANTS, volume 4076 of Lecture Notes in Computer Science, pages 510–524. Springer, 2006.
+    venue: ANTS, volume 4076 of Lecture Notes in Computer Science, pages 510-524. Springer, 2006.
     authors:
       -
         ins: Andrew Shallue
@@ -293,10 +293,11 @@ normative:
       -
         ins: Tanja Lange
         org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
+
   FIPS-186-4:
     title: Digital Signature Standard (DSS), FIPS PUB 186-4, July 2013
     target: https://csrc.nist.gov/publications/detail/fips/186/4/final
-    authors:
+    author:
       -
         ins: National Institute for Standards and Technology
         org:
@@ -312,8 +313,19 @@ normative:
 
   Schoof85:
     title: Elliptic Curves Over Finite Fields and the Computation of Square Roots mod p
-    authors: René Schoof
+    authors: Rene Schoof
     target: https://www.ams.org/journals/mcom/1985-44-170/S0025-5718-1985-0777280-6/S0025-5718-1985-0777280-6.pdf
+
+  Adj2013:
+    title: Square Root Computation over Even Extension Fields
+    authors:
+     -
+       name: Gora Adj
+       org: ISFA, Université Claude Bernard Lyon 1, Villeurbanne, France
+     -
+       name: Francisco Rodriguez-Henriquez
+       org: CINVESTAV-IPN, San Pedro Zacatenco, Mexico City, Mexico.
+    target: https://doi.org/10.1109/TC.2013.145
 
 --- abstract
 
@@ -356,40 +368,41 @@ document are to be interpreted as described in {{RFC2119}}.
 
 # Background {#background}
 
-Here we give a brief definition of elliptic curves, with an emphasis
+The following is a brief definition of elliptic curves, with an emphasis
 on defining important parameters and their relation to encoding.
 
-Let F be the finite field GF(p^k). We say that F is a field of characteristic
-p. For most applications, F is a prime field, in which case k=1 and we will
-simply write GF(p).
+Let F be the finite field GF(q) of prime characteristic p.
+For most applications, F is a prime field, in which case q=p, otherwise q=p^m
+for an integer m>1.
 
 Elliptic curves can be represented by equations of different standard forms,
 including, but not limited to: Weierstrass, Montgomery, and Edwards. Each
 of these variants correspond to a different category of curve equation.
 For example, the short Weierstrass equation is
-`y^2 = x^3 + Ax + B`. Certain encoding functions may have requirements
-on the curve form, the characteristic of the field, and the parameters, such as A and B in the previous example.
+y^2 = x^3 + A * x + B. Certain encoding functions may have requirements
+on the curve form, the characteristic of the field, and the parameters,
+such as A and B in the previous example.
 
 An elliptic curve E is specified by its equation, and a finite field F.
-The curve E forms a group, whose elements correspond to those who satisfy the
-curve equation, with values taken from the field F. As a group, E has order
+The curve E forms a group, whose elements are points who satisfy the
+curve equation, and the coordinates of a point are elements of F. As a group, E has order
 n, which is the number of points on the curve. For security reasons, it is a
 strong requirement that all cryptographic operations take place in a prime
 order group. However, not all elliptic curves generate groups of prime order.
-In those cases, it is allowed to work with elliptic curves of order n = qh,
-where q is a large prime, and h is a short number known as the cofactor.
-Thus, we may wish an encoding that returns points on the subgroup of order q.
-Multiplying a point P on E by the cofactor h guarantees that hP is a point in
-the subgroup of order q.
+In those cases, it is allowed to work with elliptic curves of order n = hr,
+where r is a large prime, and h is a short number known as the cofactor.
+Thus, one may wish an encoding that returns points on the subgroup of order r.
+To this end, multiplying a point P on E by the cofactor h guarantees that hP
+is a point belonging to the subgroup of order r.
 
 Summary of quantities:
 
-| Symbol | Meaning | Relevance
-|:------:|---------|----------
-| p | Order of finite field, F = GF(p) | Curve points need to be represented in terms of p. For prime power extension fields, we write F = GF(p^k).
-| n | Number of curve points, #E(F) = n |  For map to E, needs to produce n elements.
-| q | Order of the largest prime subgroup of E, n = qh | If n is not prime, may need mapping to q.
-| h | Cofactor | For mapping to subgroup, need to multiply by cofactor.
+| Symbol | Meaning | Relevance |
+|:------:|---------|-----------|
+| q | Order of finite field, F = GF(q) | For finite fields q=p^m. For prime fields, q=p. |
+| n | Number of curve points, #E(F) = n |  For map to E, needs to produce n elements. |
+| r | Order of the prime subgroup of E, n = h*r | If n is not prime, may need mapping to r. |
+| h | Cofactor | For mapping to subgroup, need to multiply by cofactor. |
 
 ## Terminology {#terminology}
 
@@ -427,7 +440,7 @@ outputs. Since a deserialization algorithm can often be used as a type of
 encoding algorithm, we also briefly document properties of these functions.
 
 A straightforward serialization algorithm maps a point (x, y) on E to a bitstring of length
-2\*log(p), given that x, y are both elements in GF(p). However, since
+2\*log(p), given that x and y are both elements in GF(p). However, since
 there are only n points in E (with n approximately equal to p), it is possible
 to serialize to a bitstring of length log(n). For example, one common method
 is to store the x-coordinate and a single bit to determine whether the point
@@ -440,10 +453,10 @@ coordinate.
 It is often the case that the output of the encoding function {{term-encoding}}
 should be (a) distributed uniformly at random on the elliptic curve and (b) non-invertible.
 That is, there is no discernible relation existing between outputs that can be computed
-based on the inputs. Moreover, given such an encoding function F from bitstrings to
+based on the inputs. Moreover, given such an encoding function H from bitstrings to
 points on the curve, as well as a single point y, it is computationally intractable to
-produce an input x that maps to a y via F. In practice, these requirement stem from needing
-a random oracle which outputs elliptic curve points:  one way to construct this is by first
+produce an input x that maps to a y via H. In practice, these requirement stem from needing
+a random oracle which outputs elliptic curve points: one way to construct this is by first
 taking a regular random oracle, operating entirely on bitstrings, and applying a
 suitable encoding function to the output.
 
@@ -462,7 +475,7 @@ and are less efficient than hash and encode methods.
 In practice, two types of mappings are common: (1) Injective encodings, as can be used to
 construct a PRF as F(k, m) = k\*H(m), and (2) Random Oracles, as required by PAKEs {{BMP00}},
 BLS {{BLS01}}, and IBE {{BF01}}. (Some applications, such as IBE, have additional requirements,
-such as a Supersingular, pairing-friendly curve.)
+such as a supersingular, pairing-friendly curve.)
 
 The following table lists recommended algorithms for different curves and mappings. To select
 a suitable algorithm, choose the mapping associated with the target curve. For example,
@@ -473,61 +486,53 @@ to Curve25519. When the required mapping is not clear, applications SHOULD use a
 
 | Curve  | Inj. Encoding | Random Oracle |
 |--------|---------------|------|
-| P-256 | Simple SWU {{simple-swu}} | FFSTV(SWU) {{ffstv}}
-| P-384 | Icart {{icart}} | FFSTV(Icart) {{ffstv}}
-| Curve25519 | Elligator2 {{elligator2}} | FFSTV(Elligator2) {{ffstv}}
-| Curve448 | Elligator2 {{elligator2}} | FFSTV(Elligator2) {{ffstv}}
+| P-256 | Simple SWU {{simple-swu}} | FFSTV(SWU) {{ffstv}} |
+| P-384 | Icart {{icart}} | FFSTV(Icart) {{ffstv}} |
+| Curve25519 | Elligator2 {{elligator2}} | FFSTV(Elligator2) {{ffstv}} |
+| Curve448 | Elligator2 {{elligator2}} | FFSTV(Elligator2) {{ffstv}} |
 
 # Utility Functions {#utility}
 
 Algorithms in this document make use of utility functions described below.
 
-- hash2base(x).
-  This method is parametrized by p and H, where p is the prime order of
-  the base field Fp, and H is a cryptographic hash function which
-  outputs at least floor(log2(p)) + 1 bits.
-  The function first hashes x, converts the result to an integer,
-  and reduces modulo p to give an element of Fp.
+- hash2base(x): This method is parametrized by q and H, where H is a
+  cryptographic hash function which outputs at least floor(log2(q)) + 1 bits.
+  When q=p, the function first hashes x, converts the result to an integer,
+  and reduces modulo p to produce an element of F.
   We provide a more detailed algorithm in {{hashtobase}}.
 
-- CMOV(a, b, c): If c = 1, return a, else return b.
+- CMOV(a, b, c): If c = 1, CMOV returns a, otherwise returns b.
+  Common software implementations of constant-time selects assume c = 1 or c = 0.
+  CMOV may be implemented by computing the desired selector (0 or 1) by OR-ing
+  all bits of c together. The end result will be either 0 if all bits of c are
+  zero, or 1 if at least one bit of c is 1.
 
-  Common software implementations of constant-time selects assume c = 1 or c = 0. CMOV
-  may be implemented by computing the desired selector (0 or 1) by ORing all bits of c
-  together. The end result will be either 0 if all bits of c are zero, or 1 if at least
-  one bit of c is 1.
-
-- CTEQ(a, b): Returns a == b.
+- CTEQ(a, b): It returns True whenever a is equal to b, otherwise returns False.
   Inputs a and b must be the same length (as bytestrings) and the comparison
   must be implemented in constant time.
 
-- Legendre(x, p): x^((p-1)/2).
-  The Legendre symbol computes whether the value x is a "quadratic
-  residue" modulo p, and takes values 1, -1, 0, for when x is a residue,
+- Legendre(x, p): The Legendre symbol determines whether the value x is a
+  quadratic residue modulo p, and takes values 1, -1, 0, for when x is a residue,
   non-residue, or zero, respectively. Due to Euler's criterion, this can be
-  computed in constant time, with respect to a fixed p, using
-  the equation x^((p-1)/2). For clarity, we will generally prefer using the
+  computed in constant time, with respect to a fixed p, calculating
+  x^((p-1)/2). For clarity, we will generally prefer using the
   formula directly, and annotate the usage with this definition.
 
-- sqrt(x, p):
-  Computing square roots should be done in constant time where possible.
+- sqrt(x, p): The sqrt operation is a multi-valued function, i.e. there exist two
+  valid roots of x whenever x is a quadratic residue. To maintain compatibility
+  across implementations, a single-valued sqrt function is necessary.
+  One way to get such a function is by defining a principal square root based
+  on a predicate that only one of the roots holds.
+  Alternatively, an implementation of sqrt can use predetermined formulas for
+  its calculation. For example, the square root of x can be computed as follows:
+  - If p = 3 (mod 4), sqrt(x, p) := x^((p+1)/4).
+  - If p = 5 (mod 8), calculate z := x^((p+3)/8) and verify that z^2 = -x, if so
+    z = z*sqrt(-1). Finally, sqrt(x, p) := z.
 
-  When p = 3 (mod 4), the square root can be computed as `sqrt(x, p) := x^(p+1)/4`.
-  This applies to P256, P384, and Curve448.
-
-  When p = 5 (mod 8), the square root can be computed by the following
-  algorithm, in which `sqrt(-1)` is a field element and can be precomputed.
-  This applies to Curve25519.
-
-~~~
-  sqrt(x, p) :=
-                 x^(p+3)/8     if x^(p+3)/4 == x
-      sqrt(-1) * x^(p+3)/8     otherwise
-~~~
-
-  The above two conditions hold for most practically used curves, due to the
-  simplicity of the square root function. For others, a suitable constant-time
-  Tonelli-Shanks variant should be used as in {{Schoof85}}.
+  The above conditions hold for most practically used curves defined over prime
+  fields. For other fields, there exist methods that can be used in replacement,
+  see {{Adj2013}}. Regardless the method chosen, the sqrt function should be
+  performed in constant time.
 
 # Deterministic Encodings  {#encodings}
 
@@ -565,8 +570,8 @@ order to be applied.
 
 ## Encodings for Weierstrass curves
 
-The following encodings apply to elliptic curves defined as E: y^2 = x^3+Ax+B,
-where 4A^3+27B^2 != 0.
+The following encodings apply to elliptic curves defined as E: y^2 = x^3 + A * x + B,
+where 4 * A^3 + 27 * B^2 != 0.
 
 
 ### Icart Method {#icart}
@@ -580,18 +585,18 @@ A Weierstrass curve over F_{p^n}, where p>3 and p^n = 2 mod 3
 
 **Examples**
 
-- P-384
+ - P-384
 
 **Algorithm**: map2curve_icart
 
 Input:
 
- - alpha: an octet string to be hashed.
- - A, B : the constants from the Weierstrass curve.
+ - `alpha`: an octet string to be hashed.
+ - `A`, `B` : the constants from the Weierstrass curve.
 
 Output:
 
- - (x,y), a point in E.
+ - `(x,y)`: a point in E.
 
 Operations:
 
@@ -655,7 +660,8 @@ Ulas {{SWU07}}, which is based on Shallue and Woestijne {{SW06}} method.
 
 **Preconditions**
 
-This algorithm works for any Weierstrass curve over F_{p^n} such that A≠0 and B≠0.
+This algorithm works for any Weierstrass curve over `F_{p^n}` such that `A!=0`
+and `B!=0`.
 
 **Examples**
 
@@ -757,8 +763,8 @@ Shallue-Woestijne-Ulas algorithm given by Brier et al. {{SimpleSWU}}.
 
 **Preconditions**
 
-This algorithm works for any Weierstrass curve over F_{p^n} such that A≠0,
-B≠0, and p=3 mod 4.
+This algorithm works for any Weierstrass curve over F_{p^n} such that A!=0,
+B!=0, and p=3 mod 4.
 
 **Examples**
 
@@ -783,7 +789,7 @@ Operations:
 1. Define g(x) = x^3 + Ax + B
 2. u = hash2base(alpha)
 3. x1 = -B/A * (1 + (1 / (u^4 - u^2)))
-4. x2 = −u^2 * x1
+4. x2 = -u^2 * x1
 5. If g(x1) is square, output (x1, sqrt(g(x1)))
 6. Output (x2, sqrt(g(x2)))
 ~~~
@@ -1001,11 +1007,11 @@ Additionally, `map2curve_ft(alpha)` can return the point `(c2, sqrt(1 + B))` whe
 
 ## Encodings for Montgomery curves
 
-A Montgomery curve is given by the following equation E: By^2=x^3+Ax^2+x, where
-B(A^2 − 4) ≠ 0. Note that any curve with a point of order 2 is isomorphic to
-this representation. Also notice that E cannot have a prime order group, hence,
-a scalar multiplication by the cofactor is required to obtain a point
-in the main subgroup.
+A Montgomery curve is given by the following equation `E: B * y^2 = x^3 + A * x^2 + x`, where
+`B * (A^2 - 4) != 0`. Note that any curve with a point of order 2 is isomorphic to
+this representation. Also notice that `E` cannot have a prime order group, hence,
+a scalar multiplication by a cofactor is required to obtain a point in the main
+subgroup.
 
 ### Elligator2 Method {#elligator2}
 
@@ -1014,8 +1020,8 @@ The map2curve_elligator2(alpha) implements the Elligator2 method from
 
 **Preconditions**
 
-Any curve of the form y^2=x^3+Ax^2+Bx, which covers all Montgomery curves such
-that A ≠ 0 and B=1 (i.e. j-invariant != 1728).
+Any curve of the form `y^2 = x^3 + A * x^2 + B * x`, which covers all Montgomery curves such
+that `A != 0` and `B = 1` (i.e. those curves with `j-invariant != 1728`).
 
 **Examples**
 
@@ -1026,13 +1032,13 @@ that A ≠ 0 and B=1 (i.e. j-invariant != 1728).
 
 Input:
 
- - alpha: an octet string to be hashed.
- - A,B=1: the constants of the Montgomery curve.
- - N    : a constant non-square in the field.
+ - `alpha`: an octet string to be hashed.
+ - `A,B=1`: the constants of the Montgomery curve.
+ - `N`    : a constant non-square in the field.
 
 Output:
 
- - (x,y), a point in E.
+ - (x,y): a point in E.
 
 Operations:
 
@@ -1339,7 +1345,7 @@ F : GF(p) -> E (ignoring the point at infinity). This is the case for
 
 We can also consider curves which have twisted variants, E^d. For such curves,
 for any x in GF(p), there exists y in GF(p) such that (x, y) is either a point
-on E or E^d. Hence one can construct a bijection F : GF(p) x {0,1} -> E ∪ E^d,
+on E or E^d. Hence one can construct a bijection F : GF(p) x {0,1} -> E union E^d,
 where the extra bit is needed to choose the sign of the point. This can be
 particularly useful for constructions which only need the x-coordinate of the
 point. For example, x-only scalar multiplication can be computed on Montgomery
