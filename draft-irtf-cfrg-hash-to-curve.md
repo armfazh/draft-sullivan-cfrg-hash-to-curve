@@ -368,6 +368,8 @@ document are to be interpreted as described in {{RFC2119}}.
 
 # Background {#background}
 
+## Elliptic curves
+
 The following is a brief definition of elliptic curves, with an emphasis
 on defining important parameters and their relation to encoding.
 
@@ -376,33 +378,32 @@ For most applications, F is a prime field, in which case q=p, otherwise q=p^m
 for an integer m>1.
 
 Elliptic curves can be represented by equations of different standard forms,
-including, but not limited to: Weierstrass, Montgomery, and Edwards. Each
+including, but not limited to Weierstrass, Montgomery, and Edwards. Each
 of these variants correspond to a different category of curve equation.
-For example, the short Weierstrass equation is
-y^2 = x^3 + A * x + B. Certain encoding functions may have requirements
-on the curve form, the characteristic of the field, and the parameters,
-such as A and B in the previous example.
+Certain encoding functions may have requirements on the curve form, the
+characteristic of the field, and the parameters of the curve.
 
-An elliptic curve E is specified by its equation, and a finite field F.
-The curve E forms a group, whose elements are points who satisfy the
-curve equation, and the coordinates of a point are elements of F. As a group, E has order
-n, which is the number of points on the curve. For security reasons, it is a
+An elliptic curve E is specified by an equation and a finite field F. The curve
+E forms a group, whose elements are points who satisfy the curve equation,
+and the coordinates of a point are elements of F. As a group, E has order n,
+which is the number of points on the curve. For security reasons, it is a
 strong requirement that all cryptographic operations take place in a prime
 order group. However, not all elliptic curves generate groups of prime order.
 In those cases, it is allowed to work with elliptic curves of order n = hr,
-where r is a large prime, and h is a short number known as the cofactor.
-Thus, one may wish an encoding that returns points on the subgroup of order r.
-To this end, multiplying a point P on E by the cofactor h guarantees that hP
-is a point belonging to the subgroup of order r.
+where r is a large prime, and h is known as the cofactor. Thus, one may wish an
+encoding that returns points on a subgroup of order r. To this end, multiplying
+a point P on E by the cofactor h guarantees that hP is a point belonging to a
+subgroup of order r.
 
 Summary of quantities:
 
 | Symbol | Meaning | Relevance |
 |:------:|---------|-----------|
-| q | Order of finite field, F = GF(q) | For finite fields q=p^m. For prime fields, q=p. |
-| n | Number of curve points, #E(F) = n |  For map to E, needs to produce n elements. |
-| r | Order of the prime subgroup of E, n = h*r | If n is not prime, may need mapping to r. |
-| h | Cofactor | For mapping to subgroup, need to multiply by cofactor. |
+| F,q,p | Finite field F such that char(F)=p and #F=q=p^m. | For prime fields, q=p; otherwise, q=p^m and m>1. |
+| E | Elliptic curve. | E is specified by an equation and a field F. |
+| n | Number of points on E, #E(F)=n. | This value can be factored as n=h\*r. |
+| r | Order of a prime subgroup of E. | If n is not prime, may need mapping to points in a subgroup of order r. |
+| h | Cofactor, h>=1. | For mapping to subgroup, need to multiply by cofactor. |
 
 ## Terminology {#terminology}
 
@@ -473,7 +474,7 @@ and are less efficient than hash and encode methods.
 # Algorithm Recommendations {#recommendations}
 
 In practice, two types of mappings are common: (1) Injective encodings, as can be used to
-construct a PRF as F(k, m) = k\*H(m), and (2) Random Oracles, as required by PAKEs {{BMP00}},
+construct a PRF as F(k, x) = k\*H(x), and (2) Random Oracles, as required by PAKEs {{BMP00}},
 BLS {{BLS01}}, and IBE {{BF01}}. (Some applications, such as IBE, have additional requirements,
 such as a supersingular, pairing-friendly curve.)
 
@@ -495,11 +496,33 @@ to Curve25519. When the required mapping is not clear, applications SHOULD use a
 
 Algorithms in this document make use of utility functions described below.
 
-- hash2base(x): This method is parametrized by q and H, where H is a
-  cryptographic hash function which outputs at least floor(log2(q)) + 1 bits.
-  When q=p, the function first hashes x, converts the result to an integer,
-  and reduces modulo p to produce an element of F.
-  We provide a more detailed algorithm in {{hashtobase}}.
+- is_square(x, q): It returns True whenever the value x is a quadratic residue
+  in a field of order q. Due to Euler's criterion, this function can be
+  calculated in constant time as
+
+  ~~~
+    is_square(x, q) := { True,  if x^((q-1)/2) is 0 or 1;
+                       { False, otherwise.
+  ~~~
+
+  For clarity, it is generally preferred to use this formula directly, and
+  annotate its usage with this definition.
+
+- sqrt(x, q): The sqrt operation is a multi-valued function, i.e. there exist
+  two roots of x whenever x is a quadratic residue. To maintain compatibility
+  across implementations, a single-valued sqrt function is necessary. One way
+  to get such a function is by distinguishing a principal square root through a
+  predicate that only one of the roots holds.
+  Alternatively, an implementation of sqrt can use fixed formulas for its
+  calculation. For instance, in prime fields, the square root of a quadratic
+  residue x can be obtained as follows
+  - If q=3 (mod 4), sqrt(x, q) := x^((q+1)/4).
+  - If q=5 (mod 8), set z := x^((q+3)/8) and verify that z^2 = -x, if so, update
+    z = z\*sqrt(-1). Finally, sqrt(x, q) := z.
+
+  For extension fields, there exist methods that can be used in replacement,
+  see {{Adj2013}}. Regardless the method chosen, the sqrt function should be
+  performed in constant time.
 
 - CMOV(a, b, c): If c = 1, CMOV returns a, otherwise returns b.
   Common software implementations of constant-time selects assume c = 1 or c = 0.
@@ -511,28 +534,62 @@ Algorithms in this document make use of utility functions described below.
   Inputs a and b must be the same length (as bytestrings) and the comparison
   must be implemented in constant time.
 
-- Legendre(x, p): The Legendre symbol determines whether the value x is a
-  quadratic residue modulo p, and takes values 1, -1, 0, for when x is a residue,
-  non-residue, or zero, respectively. Due to Euler's criterion, this can be
-  computed in constant time, with respect to a fixed p, calculating
-  x^((p-1)/2). For clarity, we will generally prefer using the
-  formula directly, and annotate the usage with this definition.
+- I2OSP and OS2IP: These functions are used to convert an octet string to
+  and from a non-negative integer {{RFC8017}}.
 
-- sqrt(x, p): The sqrt operation is a multi-valued function, i.e. there exist two
-  valid roots of x whenever x is a quadratic residue. To maintain compatibility
-  across implementations, a single-valued sqrt function is necessary.
-  One way to get such a function is by defining a principal square root based
-  on a predicate that only one of the roots holds.
-  Alternatively, an implementation of sqrt can use predetermined formulas for
-  its calculation. For example, the square root of x can be computed as follows:
-  - If p = 3 (mod 4), sqrt(x, p) := x^((p+1)/4).
-  - If p = 5 (mod 8), calculate z := x^((p+3)/8) and verify that z^2 = -x, if so
-    z = z*sqrt(-1). Finally, sqrt(x, p) := z.
+- a \|\| b: denotes the concatenation of bitstrings a and b.
 
-  The above conditions hold for most practically used curves defined over prime
-  fields. For other fields, there exist methods that can be used in replacement,
-  see {{Adj2013}}. Regardless the method chosen, the sqrt function should be
-  performed in constant time.
+# Hashing to a Finite Field {#hashtobase}
+
+The hash2base(x) function maps an arbitrary-large bitstring m into an element
+of a finite field. Hence, it is parametrized by F and H, where H is a
+cryptographic hash function which outputs at least floor(log2(p)) + 1 bits.
+
+When q=p, the function first hashes x, converts the result to an integer, and
+reduces modulo p to produce a prime field element.
+When q=p^m, an element of a finite field is constructed using m prime field
+elements assuming that elements are in a polynomial representation.
+
+Uniformity: most algorithms assume that hash2base maps its input to the finite
+field uniformly. In practice, there will be inherent biases. For example,
+let H=SHA256 and F be a field of characteristic p = 2^255 - 19, then by reducing
+from a 256-bit output, the values from 2^256 - 38 to 2^256 - 1 have more
+probability to be chosen. In this example, the resulting bias is negligible,
+but for others this bias could be significant. This is a standard problem in
+generating uniformly distributed integers from a bitstring. In order to smooth
+out this bias, the hash2base algorithm should use a hash function that produces
+as many bits as possible before reducing modulo p. This approach is preferable
+to an iterated procedure, such as rejection sampling, since this can be hard to reliably implement in constant time.
+
+## Implementation
+
+The following procedure implements hash2base.
+
+~~~
+hash2base(x)
+
+Parameters:
+  1. H, a cryptographic hash function producing k bits.
+  2. F, a finite field F of order q and char(F)=p.
+Preconditions:  k >= floor(log2(p)) + 1.
+Input: x, an octet string to be hashed.
+Output: y, an element in F.
+
+Steps:
+  Case q=p
+    1. t1 = H(x)
+    2. t2 = OS2IP(t1)
+    3. y = t2 mod p
+    4. Output y
+
+  Case q=p^m  
+    1. t = H(x)
+    2. for i=0 to m-1
+    3.    t1 = H( t || I2OSP(i,2) )
+    4.    t2 = OS2IP(t1)
+    5.    e_i = t2 mod p
+    6. Output y = ( e_0, ..., e_{m-1} )
+~~~
 
 # Deterministic Encodings  {#encodings}
 
@@ -541,219 +598,177 @@ Algorithms in this document make use of utility functions described below.
 The generic interface for deterministic encoding functions to elliptic curves is as follows:
 
 ~~~
-map2curve(alpha)
+P = map2curve(alpha)
 ~~~
 
-where alpha is a message to encode on a curve.
+where alpha is an octet string to be encoded as a point P on the curve. Observe
+that each encoding requires that certain conditions must hold in order to be
+applied.
 
 ## Notation
 
-As a rough style guide for the following, we use (x, y) to be the output
-coordinates of the encoding method. Indexed values are used when the algorithm
-will choose between candidate values. For example, the SWU algorithm computes
-three candidates (x1, y1), (x2, y2), (x3, y3), from which the final (x, y)
-output is chosen via constant time comparison operations.
+As a rough style guide the following convention is used:
 
-We use u, v to denote the values in Fp output from hash2base, and use as
-initial values in the encoding.
+- All arithmetic operations are performed over the finite field, unless
+  otherwise be explicitly stated, e.g. integer arithmetic.
 
-We use t1, t2, ..., as reusable temporary variables. For notable variables, we
-will use a distinct name, for ease of debugging purposes when correlating with
-test vectors.
+- (x, y): are the output coordinates of the encoding method. Indexed values
+  are used when the algorithm calculates some candidate values.
 
-The code presented here corresponds to the example Sage {{SAGE}} code found at
-{{github-repo}}. Which is additionally used to generate intermediate test
-vectors. The Sage code is also checked against the hacspec implementation.
+- u: denotes an element of F produced by the hash2base function and is used
+  as initial value of the encoding.
 
-Note that each encoding requires that certain preconditions must hold in
-order to be applied.
+- t1, t2, ...: are reusable temporary variables. For notable variables,
+  distinct names are used easing the debugging process when correlating with
+  test vectors.
 
 ## Encodings for Weierstrass curves
 
-The following encodings apply to elliptic curves defined as E: y^2 = x^3 + A * x + B,
-where 4 * A^3 + 27 * B^2 != 0.
-
+The following encodings apply to elliptic curves defined by the equation
+E: y^2 = x^3 + A\*x + B, where 4\*A^3 + 27\*B^2 != 0.
 
 ### Icart Method {#icart}
 
 The map2curve_icart(alpha) implements the Icart encoding method from {{Icart09}}.
 
-**Preconditions**
+Preconditions: A elliptic curve over F, where p>3 and p^m=2 (mod 3), or p=2 (mod 3) and odd m.
 
-A Weierstrass curve over F_{p^n}, where p>3 and p^n = 2 mod 3
-(or p = 2 mod 3 and for odd n).
+Input: alpha, an octet string to be hashed.
 
-**Examples**
+Constants: A and B, the parameters of the Weierstrass curve.
 
- - P-384
-
-**Algorithm**: map2curve_icart
-
-Input:
-
- - `alpha`: an octet string to be hashed.
- - `A`, `B` : the constants from the Weierstrass curve.
-
-Output:
-
- - `(x,y)`: a point in E.
+Output: (x, y), a point on E.
 
 Operations:
 
 ~~~
-u = hash2base(alpha)
-v = ((3A - u^4) / 6u)
-x = (v^2 - B - (u^6 / 27))^(1/3) + (u^2 / 3)
-y = ux + v
-Output (x, y)
+1. u = hash2base(alpha)
+2. v = ((3*A - u^4) / 6*u)
+3. x = (v^2 - B - (u^6 / 27))^(1/3) + (u^2 / 3)
+4. y = u * x + v
+5. Output (x, y)
 ~~~
 
-**Implementation**
+#### Implementation
 
 The following procedure implements Icart's algorithm in a straight-line fashion.
 
 ~~~
 map2curve_icart(alpha)
+Input: alpha, an octet string to be hashed.
+Output: (x, y), a point on E.
 
-Input:
-
-  alpha - value to be hashed, an octet string
-
-Output:
-
-  (x, y) - a point in E
-
-Precomputations:
-
-1. c1 = (2 * p) - 1
-2. c1 = c1 / 3               // c1 = (2p-1)/3 as integer
-3  c2 = 3^(-1)               // c2 = 1/3 (mod p)
-4. c3 = c2^3                 // c3 = 1/27 (mod p)
+Constants:
+1. c1 = (2*p - 1) / 3   // Integer arithmetic
+2  c2 = 1/3
+3. c3 = c2^3
 
 Steps:
-
-1.   u = hash2base(alpha)   // {0,1}^* -> Fp
-2.  u2 = u^2                 // u^2
-3.  u4 = u2^2                // u^4
-4.   v = 3 * A               // 3A in Fp
-5.   v = v - u4              // 3A - u^4
-6.  t1 = 6 * u               // 6u
-7.  t1 = t1^(-1)             // modular inverse
-8.   v = v * t1              // (3A - u^4)/(6u)
-9.  x1 = v^2                 // v^2
-10. x1 = x - B               // v^2 - B
-11. u6 = u4 * c3             // u^4 / 27
-12. u6 = u6 * u2             // u^6 / 27
-13. x1 = x1 - u6             // v^2 - B - u^6/27
-14. x1 = x^c1                // (v^2 - B - u^6/27) ^ (1/3)
-15. t1 = u2 * c2             // u^2 / 3
-16.  x = x + t1              // (v^2 - B - u^6/27) ^ (1/3) + (u^2 / 3)
-17.  y = u * x               // ux
-18.  y = y + v               // ux + v
+1.   u = hash2base(alpha)
+2.  u2 = u^2            // u^2
+3.  u4 = u2^2           // u^4
+4.   v = 3 * A          // 3*A
+5.   v = v - u4         // 3*A - u^4
+6.  t1 = 6 * u          // 6*u
+7.  t1 = 1 / t1         // 1 / (6*u)
+8.   v = v * t1         // v = (3*A - u^4)/(6*u)
+9.  x1 = v^2            // v^2
+10. x1 = x - B          // v^2 - B
+11. u6 = u4 * c3        // u^4 / 27
+12. u6 = u6 * u2        // u^6 / 27
+13. x1 = x1 - u6        // v^2 - B - u^6/27
+14. x1 = x^c1           // (v^2 - B - u^6/27)^(1/3)
+15. t1 = u2 * c2        // u^2 / 3
+16.  x = x + t1         // x = (v^2 - B - u^6/27)^(1/3) + (u^2 / 3)
+17.  y = u * x          // u*x
+18.  y = y + v          // y = u*x + v
 19. Output (x, y)
 ~~~
 
 ### Shallue-Woestijne-Ulas Method {#swu}
 
 The map2curve_swu(alpha) implements the Shallue-Woestijne-Ulas (SWU) method by
-Ulas {{SWU07}}, which is based on Shallue and Woestijne {{SW06}} method.
+Ulas {{SWU07}}, which is based on Shallue and Woestijne {{SW06}} method. The
+algorithm relies on the following equality
 
-**Preconditions**
+~~~
+  (u^3 * g(x1)^2 * g(x2))^2 = g(x1) * g(x2) * g(x3)
+~~~
 
-This algorithm works for any Weierstrass curve over `F_{p^n}` such that `A!=0`
-and `B!=0`.
+where g(x) := x^3+A\*x+B. Thus, it computes three candidate points constructed
+in such a way that at least one of them lies on the curve.
 
-**Examples**
+Preconditions: A Weierstrass curve over F such that A!=0 and B!=0.
 
-- P-256
-- P-384
-- P-521
+Input: alpha, an octet string to be hashed.
 
-**Algorithm**: map2curve_swu
+Constants: A and B, the parameters of the Weierstrass curve.
 
-Input:
-
- - alpha: an octet string to be hashed.
- - A, B : the constants from the Weierstrass curve.
-
-Output:
-
- - (x,y), a point in E.
+Output: (x, y), a point on E.
 
 Operations:
 
 ~~~
-1.  u = hash2base(alpha || 0x00)
-2.  v = hash2base(alpha || 0x01)
-3. x1 = v
-4. x2 = (-B / A)(1 + 1 / (u^4 * g(v)^2 + u^2 * g(v)))
-5. x3 = u^2 * g(v)^2  * g(x2)
-6. If g(x1) is square, output (x1, sqrt(g(x1)))
-7. If g(x2) is square, output (x2, sqrt(g(x2)))
-8. Output (x3, sqrt(g(x3)))
+1.    u = hash2base(alpha || I2OSP(0,1) )
+2.   x1 = hash2base(alpha || I2OSP(1,1) )
+3.  gx1 = x1^3 + A*x1 + B
+4.   x2 = (-B / A) * (1 + 1 / (u^4 * gx1^2 + u^2 * gx1))
+5.  gx2 = x2^3 + A*x2 + B
+6.   x3 = u^2 * gx1 * x2
+7.  gx3 = x3^3 + A*x3 + B
+8.  If is_square(gx1,q) then x = x1 and y = sqrt(gx1)
+9.  If is_square(gx2,q) then x = x2 and y = sqrt(gx2)
+10. If is_square(gx3,q) then x = x3 and y = sqrt(gx3)
+11. Output (x, y)
 ~~~
 
-The algorithm relies on the following equality:
-
-~~~
-u^3 * g(v)^2  * g(x2) = g(x1) * g(x2) * g(x3)
-~~~
-
-The algorithm computes three candidate points, constructed such that at least one of
-them lies on the curve.
-
-**Implementation**
+#### Implementation
 
 The following procedure implements SWU's algorithm in a straight-line fashion.
 
 ~~~
 map2curve_swu(alpha)
 
-Input:
+Input: alpha, an octet string to be hashed.
+Output: (x, y), a point on E.
 
-  alpha - value to be hashed, an octet string
-
-Output:
-
-  (x, y) - a point in E
-
-Precomputations:
-
-1.  c1 = -B / A mod p           // Field arithmetic
-2.  c2 = (p - 1)/2              // Integer arithmetic
+Constants:
+1. c1 = -B / A
+2. c2 = (p - 1)/2       // Integer arithmetic
 
 Steps:
 
-1.    u = hash2base(alpha || 0x00)  // {0,1}^* -> Fp
-2.    v = hash2base(alpha || 0x01)  // {0,1}^* -> Fp
-3.   x1 = v                     // x1 = v
-4.   gv = v^3
-5.   gv = gv + (A * v)
-6.   gv = gv + B                // gv = g(v)
-7.  gx1 = gv                    // gx1 = g(x1)
-8.   u2 = u^2
-9.   t1 = u2 * gv               // t1 = u^2 * g(v)
-10.  t2 = t1^2
-11.  t2 = t2 + t1
-12.  t2 = t2^(-1)               // t2 = 1/(u^4*g(v)^2 + u^2*g(v))
-13.  n1 = 1 + t2
-14.  x2 = c1 * n1               // x2 = -B/A * (1 + 1/(t1^2 + t1))
-15. gx2 = x2^3
-16.  t2 = A * x2
-17. gx2 = gx2 + t2
-18. gx2 = gx2 + B               // gx2 = g(x2)
-19.  x3 = x2 * t1               // x3 = x2 * u^2 * g(v)
-20. gx3 = x3^3
-21. gx3 = gx3 + (A * x3)
-22. gx3 = gx3 + B               // gx3 = g(X3(t, u))
-23.  l1 = gx1^c2                // Legendre(gx1)
-24.  l2 = gx2^c2                // Legendre(gx2)
-25.   x = CMOV(x2, x3, l2)      // If l2 = 1, choose x2, else choose x3
-26.   x = CMOV(x1, x, l1)       // If l1 = 1, choose x1, else choose x
-27.  gx = CMOV(gx2, gx3, l2)    // If l2 = 1, choose gx2, else choose gx3
-28.  gx = CMOV(gx1, gx, l1)     // If l1 = 1, choose gx1, else choose gx
-29.   y = sqrt(gx)
-30. Output (x, y)
+1.    u = hash2base(alpha || I2OSP(0,1) )
+2.   x1 = hash2base(alpha || I2OSP(1,1) )
+3.  gx1 = x1^2
+4.  gx1 = gx1 + A
+5.  gx1 = gx1 * x1
+6.  gx1 = gx1 + B       // gx1 = x1^3 + A*x1 + B
+7.   t1 = u^2
+8.   t1 = t1 * gx1      // t1 = u^2 * gx1
+9.   t2 = t1^2
+10.  t2 = t2 + t1      
+11.  t2 = 1 / t2        // t2 = 1 / (t1^2 + t1)
+12.  x2 = t2 + 1
+13.  x2 = x2 * c1       // x2 = (-B/A) * (1 + 1/(t1^2 + t1))
+14. gx2 = x2^2
+15. gx2 = gx2 + A
+16. gx2 = gx2 * x2
+17. gx2 = gx2 + B       // gx2 = x2^3 + A*x2 + B
+18.  x3 = t1 * gx1       
+19.  x3 = x3 * x2       // x3 = u^2 * gx1 * x2
+20. gx3 = x3^2
+21. gx3 = gx3 + A
+22. gx3 = gx3 * x3
+23. gx3 = gx3 + B       // gx3 = x2^3 + A*x2 + B
+24.  e1 = gx1^c2              // is_square(gx1)
+25.  e2 = gx2^c2              // is_square(gx2)
+26.   x = CMOV(x2, x3, e2)    // If e2 = 1, x = x2, else x = x3
+27.   x = CMOV(x1, x, e1)     // If e1 = 1, x = x1, else x = x
+28.  gx = CMOV(gx2, gx3, e2)  // If e2 = 1, gx = gx2, else gx = gx3
+29.  gx = CMOV(gx1, gx, e1)   // If e1 = 1, gx = gx1, else gx = gx
+30.   y = sqrt(gx)
+31. Output (x, y)
 ~~~
 
 ### Simplified SWU Method {#simple-swu}
@@ -1380,7 +1395,8 @@ string into an EC point.
 # Sample Code {#samplecode}
 
 This section contains reference implementations for each map2curve variant built
-using {{hacspec}}.
+using {{hacspec}}.  The code presented here corresponds to the example Sage {{SAGE}} code found at {{github-repo}}. Which is additionally used to generate intermediate test
+vectors.
 
 ## Icart Method
 
@@ -1630,67 +1646,7 @@ def map2curve25519(r:felem_t) -> felem_t:
     return x
 ~~~
 
-## hash2base {#hashtobase}
 
-The following procedure implements hash2base.
-
-~~~
-hash2base(x)
-
-Parameters:
-
-  H - cryptographic hash function to use
-  hbits - number of bits output by H
-  p - order of the base field Fp
-  label - context label for domain separation
-
-Preconditions:
-
-  floor(log2(p)) + 1 >= hbits
-
-Input:
-
-  x - an octet string to be hashed
-
-Output:
-
-  y - a value in the field Fp
-
-Steps:
-
-  1. t1 = H("h2c" || label || I2OSP(len(x), 4) || x)
-  2. t2 = OS2IP(t1)
-  3. y = t2 mod p
-  4. Output y
-~~~
-
-where I2OSP, OS2IP {{RFC8017}} are used to convert an octet string to and from
-a non-negative integer, and a || b denotes concatenation of a and b.
-
-### Considerations
-
-Performance: hash2base requires hashing the entire input x. In some
-algorithms/ciphersuite combinations, hash2base is called multiple times. For
-large inputs, implementers can therefore consider hashing x before calling
-hash2base. I.e. hash2base(H'(x)).
-
-Most algorithms assume that hash2base maps its input to the base field
-uniformly. In practice, there will be inherent biases. For example, taking H
-as SHA256, over the finite field used by Curve25519 we have p = 2^255 - 19, and
-thus when reducing from 255 bits, the values of 0 .. 19 will be twice as
-likely to occur. This is a standard problem in generating uniformly
-distributed integers from a bitstring. In this example, the resulting bias is
-negligible, but for others this bias can be significant.
-
-To address this, our hash2base algorithm greedily takes as many bits as
-possible before reducing mod p, in order to smooth out this bias. This is
-preferable to an iterated procedure, such as rejection sampling, since this
-can be hard to reliably implement in constant time.
-
-The running time of each map2curve function is dominated by the cost of
-finite field inversion. Assuming T_i(F) is the time of inversion in field F,
-a rough bound on the running time of each map2curve function is O(T_i(F))
-for the associated field.
 
 # Test Vectors
 
