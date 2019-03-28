@@ -13,7 +13,7 @@ def g(x):
     return F(x^3 + A*x + B)
 
 def x1(u):
-    return (-B / A) * (1 + (1 / (u^4-  u^2)))
+    return (-B / A) * (1 + mult_inv(u^4 - u^2))
 
 def x2(u):
     return - u^2 * x1(u)
@@ -28,9 +28,9 @@ def simple_swu(alpha):
     x2v = x2(u)
     assert U(u)^2 == -g(x1v)*g(x2v)
     if is_square(g(x1v)):
-        return E(x1v, sqrt(g(x1v)))
+        return E(x1v, sq_root(g(x1v)))
     else:
-        return E(x2v, sqrt(g(x2v)))
+        return E(x2v, sq_root(g(x2v)))
 
 A_INV = (A ^ -1)
 B_OVER_A =  - B * A_INV
@@ -71,11 +71,11 @@ def simple_swu_slp(alpha):
 
     l1 = gx1^ORDER_OVER_2
     if l1 == 1:
-        y1 = sqrt(gx1)
+        y1 = sq_root(gx1)
         tv("y1", y1, 32)
         return E(x1, y1)
     else:
-        y2 = sqrt(gx2)
+        y2 = sq_root(gx2)
         tv("y2", y2, 32)
         return E(x2, y2)
 

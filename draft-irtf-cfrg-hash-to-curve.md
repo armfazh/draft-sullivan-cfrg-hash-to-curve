@@ -321,7 +321,7 @@ normative:
     authors:
      -
        name: Gora Adj
-       org: ISFA, Université Claude Bernard Lyon 1, Villeurbanne, France
+       org: ISFA, Universite Claude Bernard Lyon 1, Villeurbanne, France
      -
        name: Francisco Rodriguez-Henriquez
        org: CINVESTAV-IPN, San Pedro Zacatenco, Mexico City, Mexico.
@@ -524,15 +524,17 @@ Algorithms in this document make use of utility functions described below.
   see {{Adj2013}}. Regardless the method chosen, the sqrt function should be
   performed in constant time.
 
-- CMOV(a, b, c): If c = 1, CMOV returns a, otherwise returns b.
-  Common software implementations of constant-time selects assume c = 1 or c = 0.
-  CMOV may be implemented by computing the desired selector (0 or 1) by OR-ing
-  all bits of c together. The end result will be either 0 if all bits of c are
-  zero, or 1 if at least one bit of c is 1.
+- CMOV(a, b, c): If c=0, CMOV returns a, otherwise returns b. To prevent against
+  timing attacks, this operation must run in constant time without revealing the
+  value of c. Commonly some implementations assume the selector be c=1 or c=0;
+  thus, given a bitstring C, the desired selector c can be computed by OR-ing
+  all bits of C together. The resulting selector will be either 0 if all bits
+  of C are zero, or 1 if at least one bit of C is 1.
 
-- CTEQ(a, b): It returns True whenever a is equal to b, otherwise returns False.
-  Inputs a and b must be the same length (as bytestrings) and the comparison
-  must be implemented in constant time.
+- CTEQ(a, b): Given two bitstrings of the same length, CTEQ returns True
+  whenever a is equal to b, otherwise returns False. Like CMOV, this operation
+  must be implemented in constant time with respect to their values and their
+  length.
 
 - I2OSP and OS2IP: These functions are used to convert an octet string to
   and from a non-negative integer {{RFC8017}}.
@@ -612,8 +614,8 @@ As a rough style guide the following convention is used:
 - All arithmetic operations are performed over the finite field, unless
   otherwise be explicitly stated, e.g. integer arithmetic.
 
-- (x, y): are the output coordinates of the encoding method. Indexed values
-  are used when the algorithm calculates some candidate values.
+- (x, y): are the coordinates of a point obtained by the encoding method.
+  Indexed values are used when the algorithm calculates some candidate values.
 
 - u: denotes an element of F produced by the hash2base function and is used
   as initial value of the encoding.
@@ -631,7 +633,8 @@ E: y^2 = x^3 + A\*x + B, where 4\*A^3 + 27\*B^2 != 0.
 
 The map2curve_icart(alpha) implements the Icart encoding method from {{Icart09}}.
 
-Preconditions: A elliptic curve over F, where p>3 and p^m=2 (mod 3), or p=2 (mod 3) and odd m.
+Preconditions: An elliptic curve over F, such that p>3 and q=p^m=2 (mod 3), or
+p=2 (mod 3) and odd m.
 
 Input: alpha, an octet string to be hashed.
 
@@ -644,7 +647,7 @@ Operations:
 ~~~
 1. u = hash2base(alpha)
 2. v = ((3*A - u^4) / 6*u)
-3. x = (v^2 - B - (u^6 / 27))^(1/3) + (u^2 / 3)
+3. x = (v^2 - B - (u^6 / 27))^((2*q - 1)/3) + (u^2 / 3)
 4. y = u * x + v
 5. Output (x, y)
 ~~~
@@ -667,13 +670,13 @@ Steps:
 1.   u = hash2base(alpha)
 2.  u2 = u^2            // u^2
 3.  u4 = u2^2           // u^4
-4.   v = 3 * A          // 3*A
-5.   v = v - u4         // 3*A - u^4
-6.  t1 = 6 * u          // 6*u
-7.  t1 = 1 / t1         // 1 / (6*u)
-8.   v = v * t1         // v = (3*A - u^4)/(6*u)
+4.   v = 3 * A          // 3 * A
+5.   v = v - u4         // 3 * A - u^4
+6.  t1 = 6 * u          // 6 * u
+7.  t1 = 1 / t1         // 1 / (6 * u)
+8.   v = v * t1         // v = (3 * A - u^4)/(6 * u)
 9.  x1 = v^2            // v^2
-10. x1 = x - B          // v^2 - B
+10. x1 = x1 - B         // v^2 - B
 11. u6 = u4 * c3        // u^4 / 27
 12. u6 = u6 * u2        // u^6 / 27
 13. x1 = x1 - u6        // v^2 - B - u^6/27
@@ -716,9 +719,9 @@ Operations:
 5.  gx2 = x2^3 + A*x2 + B
 6.   x3 = u^2 * gx1 * x2
 7.  gx3 = x3^3 + A*x3 + B
-8.  If is_square(gx1,q) then x = x1 and y = sqrt(gx1)
-9.  If is_square(gx2,q) then x = x2 and y = sqrt(gx2)
-10. If is_square(gx3,q) then x = x3 and y = sqrt(gx3)
+8.  If gx1 is square, set x = x1 and y = sqrt(gx1)
+9.  If gx2 is square, set x = x2 and y = sqrt(gx2)
+10. If gx3 is square, set x = x3 and y = sqrt(gx3)
 11. Output (x, y)
 ~~~
 
@@ -733,7 +736,7 @@ Input: alpha, an octet string to be hashed.
 Output: (x, y), a point on E.
 
 Constants:
-1. c1 = -B / A
+1. c1 = - B / A
 2. c2 = (p - 1)/2       // Integer arithmetic
 
 Steps:
@@ -750,25 +753,24 @@ Steps:
 10.  t2 = t2 + t1      
 11.  t2 = 1 / t2        // t2 = 1 / (t1^2 + t1)
 12.  x2 = t2 + 1
-13.  x2 = x2 * c1       // x2 = (-B/A) * (1 + 1/(t1^2 + t1))
+13.  x2 = x2 * c1       // x2 = (-B/A) * (1 + 1/(u^4*gx1^2 + u^2*gx1))
 14. gx2 = x2^2
 15. gx2 = gx2 + A
 16. gx2 = gx2 * x2
 17. gx2 = gx2 + B       // gx2 = x2^3 + A*x2 + B
-18.  x3 = t1 * gx1       
-19.  x3 = x3 * x2       // x3 = u^2 * gx1 * x2
-20. gx3 = x3^2
-21. gx3 = gx3 + A
-22. gx3 = gx3 * x3
-23. gx3 = gx3 + B       // gx3 = x2^3 + A*x2 + B
-24.  e1 = gx1^c2              // is_square(gx1)
-25.  e2 = gx2^c2              // is_square(gx2)
-26.   x = CMOV(x2, x3, e2)    // If e2 = 1, x = x2, else x = x3
-27.   x = CMOV(x1, x, e1)     // If e1 = 1, x = x1, else x = x
-28.  gx = CMOV(gx2, gx3, e2)  // If e2 = 1, gx = gx2, else gx = gx3
-29.  gx = CMOV(gx1, gx, e1)   // If e1 = 1, gx = gx1, else gx = gx
-30.   y = sqrt(gx)
-31. Output (x, y)
+18.  x3 = t1 * x2       // x3 = u^2 * gx1 * x2
+19. gx3 = x3^2
+20. gx3 = gx3 + A
+21. gx3 = gx3 * x3
+22. gx3 = gx3 + B       // gx3 = x2^3 + A*x2 + B
+23.  e1 = gx1^c2              // is_square(gx1)
+24.  e2 = gx2^c2              // is_square(gx2)
+25.   x = CMOV(x3, x2, e2)    // If e2 = 1, x = x2, else x = x3
+26.   x = CMOV(x, x1, e1)     // If e1 = 1, x = x1, else x = x
+27.  gx = CMOV(gx3, gx2, e2)  // If e2 = 1, gx = gx2, else gx = gx3
+28.  gx = CMOV(gx, gx1, e1)   // If e1 = 1, gx = gx1, else gx = gx
+29.   y = sqrt(gx)
+30. Output (x, y)
 ~~~
 
 ### Simplified SWU Method {#simple-swu}
