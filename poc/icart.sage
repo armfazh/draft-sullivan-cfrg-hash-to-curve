@@ -1,9 +1,9 @@
 from hash_to_base import *
-from common import *
 from utils import *
+load("common.sage")
 
 # P384
-p = 2^384 - 2^128 - 2^96 + 2^32 - 1
+p = PrimeDict["P-384"]
 m = 1
 q = p^m
 F = GF(q)

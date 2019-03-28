@@ -712,8 +712,8 @@ Output: (x, y), a point on E.
 Operations:
 
 ~~~
-1.    u = hash2base(alpha || I2OSP(0,1) )
-2.   x1 = hash2base(alpha || I2OSP(1,1) )
+1.    u = hash2base(alpha || I2OSP(0,1))
+2.   x1 = hash2base(alpha || I2OSP(1,1))
 3.  gx1 = x1^3 + A*x1 + B
 4.   x2 = (-B / A) * (1 + 1 / (u^4 * gx1^2 + u^2 * gx1))
 5.  gx2 = x2^3 + A*x2 + B
@@ -737,12 +737,10 @@ Output: (x, y), a point on E.
 
 Constants:
 1. c1 = - B / A
-2. c2 = (p - 1)/2       // Integer arithmetic
 
 Steps:
-
-1.    u = hash2base(alpha || I2OSP(0,1) )
-2.   x1 = hash2base(alpha || I2OSP(1,1) )
+1.    u = hash2base(alpha || I2OSP(0,1))
+2.   x1 = hash2base(alpha || I2OSP(1,1))
 3.  gx1 = x1^2
 4.  gx1 = gx1 + A
 5.  gx1 = gx1 * x1
@@ -762,13 +760,13 @@ Steps:
 19. gx3 = x3^2
 20. gx3 = gx3 + A
 21. gx3 = gx3 * x3
-22. gx3 = gx3 + B       // gx3 = x2^3 + A*x2 + B
-23.  e1 = gx1^c2              // is_square(gx1)
-24.  e2 = gx2^c2              // is_square(gx2)
-25.   x = CMOV(x3, x2, e2)    // If e2 = 1, x = x2, else x = x3
-26.   x = CMOV(x, x1, e1)     // If e1 = 1, x = x1, else x = x
-27.  gx = CMOV(gx3, gx2, e2)  // If e2 = 1, gx = gx2, else gx = gx3
-28.  gx = CMOV(gx, gx1, e1)   // If e1 = 1, gx = gx1, else gx = gx
+22. gx3 = gx3 + B       // gx3 = x3^3 + A*x3 + B
+23.  e1 = is_square(gx1, q)
+24.  e2 = is_square(gx2, q)
+25.   x = CMOV(x3, x2, e2)    // If e2=True, x = x2, else x = x3
+26.   x = CMOV(x, x1, e1)     // If e1=True, x = x1, else x = x
+27.  gx = CMOV(gx3, gx2, e2)  // If e2=True, gx = gx2, else gx = gx3
+28.  gx = CMOV(gx, gx1, e1)   // If e1=True, gx = gx1, else gx = gx
 29.   y = sqrt(gx)
 30. Output (x, y)
 ~~~
@@ -778,84 +776,62 @@ Steps:
 The map2curve_simple_swu(alpha) implements a simplified version of
 Shallue-Woestijne-Ulas algorithm given by Brier et al. {{SimpleSWU}}.
 
-**Preconditions**
+Preconditions: A Weierstrass curve over F such that A!=0, B!=0, and p=3 (mod 4).
 
-This algorithm works for any Weierstrass curve over F_{p^n} such that A!=0,
-B!=0, and p=3 mod 4.
+Input: alpha, an octet string to be hashed.
 
-**Examples**
+Constants: A and B, the constants of the Weierstrass curve.
 
-- P-256
-- P-384
-- P-521
-
-**Algorithm**: map2curve_simple_swu
-
-Input:
-
- - alpha: an octet string to be hashed.
- - A, B : the constants from the Weierstrass curve.
-
-Output:
-
- - (x,y), a point in E.
+Output: (x,y), a point on E.
 
 Operations:
 
 ~~~
-1. Define g(x) = x^3 + Ax + B
-2. u = hash2base(alpha)
-3. x1 = -B/A * (1 + (1 / (u^4 - u^2)))
-4. x2 = -u^2 * x1
-5. If g(x1) is square, output (x1, sqrt(g(x1)))
-6. Output (x2, sqrt(g(x2)))
+1.   u = hash2base(alpha)
+2.  x1 = (-B / A) * (1 + (1 / (u^4 - u^2)))
+3. gx1 = x1^3 + A*x1 + B
+4.  x2 = -u^2 * x1
+5. gx2 = x2^3 + A*x2 + B
+6. If gx1 is square, set x = x1 and y = sqrt(gx1)
+7. If gx2 is square, set x = x2 and y = sqrt(gx2)
+8. Output (x, y)
 ~~~
 
-**Implementation**
+#### Implementation
 
 The following procedure implements the Simple SWU's algorithm in a straight-line
 fashion.
 
 ~~~
 map2curve_simple_swu(alpha)
+Input: alpha, an octet string to be hashed.
+Output: (x, y), a point on E.
 
-Input:
-
-  alpha - value to be encoded, an octet string
-
-Output:
-
-  (x, y) - a point in E
-
-Precomputations:
-
-1.  c1 = -B / A mod p           // Field arithmetic
-2.  c2 = (p - 1)/2              // Integer arithmetic
+Constants:
+1.  c1 = - B / A
 
 Steps:
-
-1.    u = hash2base(alpha)  // {0,1}^* -> Fp
-2.   u2 = u^2
-3.   u2 = -u2                // u2 = -u^2
-4.   u4 = u2^2
-5.   t1 = u4 + u2
-6.   t1 = t1^(-1)
-7.   n1 = 1 + t2             // n1 = 1 + (1 / (u^4 - u^2))
-8.   x1 = c1 * n1            // x1 = -B/A * (1 + (1 / (u^4 - u^2)))
-9.  gx1 = x1 ^ 3
-10.  t1 = A * x1
-11. gx1 = gx1 + t1
-12. gx1 = gx1 + B            // gx1 = x1^3 + Ax1 + B = g(x1)
-13.   x2 = u2 * x1           // x2 = -u^2 * x1
-14.  gx2 = x2^3
-15.   t1 = A * x2
-16.  gx2 = gx2 + 12
-17.  gx2 = gx2 + B           // gx2 = x2^3 + Ax2 + B = g(x2)
-18.   e = gx1^c2
-19.   x = CMOV(x1, x2, l1)      // If l1 = 1, choose x1, else choose x2
-20.  gx = CMOV(gx1, gx2, l1)    // If l1 = 1, choose gx1, else choose gx2
-21.   y = sqrt(gx)
-22. Output (x, y)
+1.    u = hash2base(alpha)
+2.   t1 = -u^2            
+3.   t2 = t1^2            
+4.   x1 = t2 + t1
+5.   x1 = 1 / x1
+6.   x1 = x1 + 1         
+7.   x1 = x1 * c1            // x1 = (-B / A) * (1 + (1 / (u^4 - u^2)))
+8.  gx1 = x1^2
+9.  gx1 = gx1 + A
+10. gx1 = gx1 * x1
+11. gx1 = gx1 + B            // gx1 = x1^3 + A*x1 + B
+12.  x2 = t1 * x1            // x2 = -u^2 * x1
+13. gx2 = x2^2
+14. gx2 = gx2 + A
+15. gx2 = gx2 * x2
+16. gx2 = gx2 + B            // gx2 = x2^3 + A*x2 + B
+17.   e = is_square(gx1, q)
+18.   x = CMOV(x2, x1, e)    // If e=True, x = x1, else x = x2
+19.  gx = CMOV(gx2, gx1, e)  // If e=True, gx = gx1, else gx = gx2
+20.   y = sqrt(gx)
+21. Output (x, y)
 ~~~
 
 ### Boneh-Franklin Method {#supersingular}
