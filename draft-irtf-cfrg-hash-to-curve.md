@@ -837,68 +837,48 @@ Steps:
 ### Boneh-Franklin Method {#supersingular}
 
 The map2curve_bf(alpha) implements the Boneh-Franklin method {{BF01}} which
-covers the case of supersingular curves `E: y^2=x^3+B`. This method does not
-guarantee that the resulting a point be in a specific subgroup of the curve.
-To do that, a scalar multiplication by a cofactor is required.
+covers supersingular curves defined as y^2 = x^3 + B. Like other encodings,
+the resulting a point must be multiplied by cofactor to send the point to a
+specific subgroup of the curve.
 
-**Preconditions**
+Preconditions: A Weierstrass curve over F such that A=0 and q=2 (mod 3).
 
-This algorithm works for any Weierstrass curve over `F_q` such that `A=0` and
-`q=2 mod 3`.
+Input: alpha, an octet string to be hashed.
 
-**Examples**
+Constants: B, the parameter of the Weierstrass curve.
 
-- `y^2 = x^3 + 1`
-
-**Algorithm**: map2curve_bf
-
-Input:
-
- - `alpha`: an octet string to be hashed.
- - `B`: the constant from the Weierstrass curve.
-
-Output:
-
- - `(x, y)`: a point in E.
+Output: (x, y), a point on E.
 
 Operations:
 
 ~~~
 1. u = hash2base(alpha)
 2. x = (u^2 - B)^((2 * q - 1) / 3)
-3. Output (x, u)
+3. y = u
+4. Output (x, y)
 ~~~
 
-**Implementation**
+#### Implementation
 
 The following procedure implements the Boneh-Franklin's algorithm in a
 straight-line fashion.
 
 ~~~
 map2curve_bf(alpha)
+Input: alpha, an octet string to be hashed.
+Output: (x, y), a point on E.
 
-Input:
-
- alpha: an octet string to be hashed.
- B    : the constant from the Weierstrass curve.
-
-Output:
-
- (x, y): a point in E
-
-Precomputations:
-
-1.  c = (2 * q - 1) / 3    // Integer arithmetic
+Constants:
+1. c1 = (2 * q - 1) / 3   // Integer arithmetic
 
 Steps:
-
-1.  u = hash2base(alpha)  // {0,1}^* -> F_q
-2. t0 = u^2                // t0 = u^2
-3. t1 = t0 - B             // t1 = u^2 - B
-4.  x = t1^c               // x  = (u^2 - B)^((2 * q - 1) / 3)
-5. Output (x, u)
+1.  u = hash2base(alpha)
+2. t1 = u^2
+3. t1 = t1 - B
+4.  x = t1^c1             // x = (u^2 - B)^((2 * q - 1) / 3)
+5.  y = u
+6. Output (x, y)
 ~~~
-
 
 ### Fouque-Tibouchi Method {#ftpairing}
 

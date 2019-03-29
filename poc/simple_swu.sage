@@ -13,6 +13,8 @@ E = EllipticCurve(F, [A, B])
 
 h2c_suite = "H2C-P256-SHA256-SSWU-"
 
+# Section 7 of https://link.springer.com/content/pdf/10.1007/978-3-642-14623-7_13.pdf
+
 def g(x):
     return x^3 + A*x + B
 
@@ -25,7 +27,7 @@ def X2(u):
 def U(u):
     return u^3 * g(X1(u))
 
-# Section 7 of https://link.springer.com/content/pdf/10.1007/978-3-642-14623-7_13.pdf
+# Textbook implementation
 def simple_swu(alpha):
     u = h2b_from_label(h2c_suite, alpha)
     x1 = X1(u)
@@ -36,8 +38,10 @@ def simple_swu(alpha):
     else:
         return E(x2, sq_root(g(x2),q))
 
+# Constants
 B_OVER_A = - B / A
 
+# Implementation
 def simple_swu_slp(alpha):
     u = h2b_from_label(h2c_suite, alpha)
     tv("u", u, 32)
