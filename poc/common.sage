@@ -1,13 +1,36 @@
+
+bnPrime = lambda x : 36*x**4 + 36*x**3 + 24*x**2 + 6*x + 1
+blsPrime = lambda x : (x-1)**2*(x**4-x**2+1)/3 + x
 # List of primes
 PrimeDict = {
-    "P-251": 2**251-9,
+    # Curve25519
     "P-255": 2**255-19,
-    "P-448": 2**448-2**224-1,
+    # NIST P-256
     "P-256": 2**256-2**224+2**192+2**96-1,
+    # NIST P-384
     "P-384": 2**384-2**128-2**96+2**32-1,
+    # Curve448
+    "P-448": 2**448-2**224-1,
+    # SIKE-P503
     "P-503": 2**250*3**159-1,
+    # NIST P-521
     "P-521": 2**521-1,
+    # BN254 by Pereira, Simplicio, Naehrig, Barreto
+    "BN254": bnPrime(-(2**62 + 2**55 + 1)),
+    # BN256 by Naehrig, Niederhagen, Schwabe
+    "BN256": bnPrime(6518589491078791937),
+    # Old SNARKs and zCash prime (BN254)
+    "zCASH": 21888242871839275222246405745257275088696311157297823662689037894645226208583,
+    # New zCash prime 381 is slight below the new 384 bits for 128-bit security
+    "BLS12-381": blsPrime(-0xd201000000010000),
+    # Scott ia.cr/2019/077 (new 128-bit security)
+    "BLS12-384": blsPrime(0x10008000001001200),
+    # Barreto curve y = x^3+2
+    "BN382": bnPrime(-(2^94 + 2^78 + 2^67 + 2^64 + 2^48 + 1)),
 }
+
+for i in PrimeDict:
+    assert is_prime(PrimeDict[i])
 
 def CMOV(x, y, b):
     """

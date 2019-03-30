@@ -215,6 +215,23 @@ normative:
       -
         ins: Tanja Lange
         org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
+  Elligator2A0:
+    title: "Quantum circuits for the CSIDH: optimizing quantum evaluation of isogenies"
+    venue: Advances in Cryptology - EUROCRYPT 2019.
+    target: https://eprint.iacr.org/2018/1059
+    authors:
+      -
+        ins: Daniel J. Bernstein
+        org: Department of Computer Science, University of Illinois at Chicago, USA
+      -
+        ins: Tanja Lange
+        org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
+      -
+        ins: Chloe Martindale
+        org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
+      -
+        ins: Lorenz Panny
+        org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
   SW06:
     title: Construction of rational points on elliptic curves over finite fields
     venue: ANTS, volume 4076 of Lecture Notes in Computer Science, pages 510-524. Springer, 2006.
@@ -485,12 +502,14 @@ is the recommended injective encoding for P-256. Similarly, the FFSTV Random Ora
 described in {{ffstv}} composed with Elligator2 should be used for Random Oracle mappings
 to Curve25519. When the required mapping is not clear, applications SHOULD use a Random Oracle.
 
-| Curve  | Inj. Encoding | Random Oracle |
-|--------|---------------|------|
-| P-256 | Simple SWU {{simple-swu}} | FFSTV(SWU) {{ffstv}} |
-| P-384 | Icart {{icart}} | FFSTV(Icart) {{ffstv}} |
-| Curve25519 | Elligator2 {{elligator2}} | FFSTV(Elligator2) {{ffstv}} |
-| Curve448 | Elligator2 {{elligator2}} | FFSTV(Elligator2) {{ffstv}} |
+| Curve | Encoding | Section |
+|-------|----------|---------|
+| P-384      | Icart           | {{icart}}       |
+| P-256      | Simple SWU      | {{simple-swu}}  |
+| Curve25519 | Elligator2      | {{elligator2}}  |
+| Curve448   | Elligator2      | {{elligator2}}  |
+| SECP256K1  | Fouque-Tibouchi | {{ftpairing}}   |
+| BN256      | Fouque-Tibouchi | {{ftpairing}}   |
 
 # Utility Functions {#utility}
 
@@ -834,18 +853,19 @@ Steps:
 21. Output (x, y)
 ~~~
 
+## Encodings for Supersingular curves
+
 ### Boneh-Franklin Method {#supersingular}
 
 The map2curve_bf(alpha) implements the Boneh-Franklin method {{BF01}} which
-covers supersingular curves defined as y^2 = x^3 + B. Like other encodings,
-the resulting a point must be multiplied by cofactor to send the point to a
-specific subgroup of the curve.
+covers the supersingular curves defined by y^2 = x^3 + B over a field F such
+that q=2 (mod 3).
 
-Preconditions: A Weierstrass curve over F such that A=0 and q=2 (mod 3).
+Preconditions: A supersingular curve over F such that q=2 (mod 3).
 
 Input: alpha, an octet string to be hashed.
 
-Constants: B, the parameter of the Weierstrass curve.
+Constants: B, the parameter of the supersingular curve.
 
 Output: (x, y), a point on E.
 
@@ -880,103 +900,133 @@ Steps:
 6. Output (x, y)
 ~~~
 
-### Fouque-Tibouchi Method {#ftpairing}
+### Elligator2 Method
 
-The map2curve_ft(alpha) implements the Fouque-Tibouchi's method {{FT12}}
-(Sec. 3, Def. 2) which covers the case of pairing-friendly curves
-`E : y^2 = x^3 + B`.
-Note that for pairing curves the destination group is usually a subgroup of the
-curve, hence, a scalar multiplication by the cofactor will be required to send
-the point to the desired subgroup.
+The map2curve_ell2A0(alpha) implements a derivation of the Elligator2 method
+{{Elligator2A0}} targeting supersingular curves defined by y^2 = x^3 + B\*x
+over a field F such that q=3 (mod 4).
 
-**Preconditions**
+Preconditions: A supersingular curve over F such that q=3 (mod 4).
 
-This algorithm works for any Weierstrass curve over `F_q` such that `q=7 mod 12`,
-`A=0`, and `1+B` is a non-zero square in the field. This covers the case
-`q=1 mod 3` not handled by Boneh-Franklin's method.
+Input: alpha, an octet string to be hashed.
 
-**Examples**
+Constants: B, the parameter of the supersingular curve.
 
-- SECP256K1 curve {{SEC2}}
-- BN curves {{BN05}}
-- KSS curves {{KSS08}}
-- BLS curves {{BLS02}}
-
-**Algorithm**: map2curve_ft
-
-Input:
-
- - `alpha`: an octet string to be hashed.
- - `B`: the constant from the Weierstrass curve.
- - `s`: a constant equal to sqrt(-3) in the field.
-
-Output:
-
- - (x, y): a point in E.
+Output: (x, y), a point on E.
 
 Operations:
 
 ~~~
-1. t = hash2base(alpha)
-2. w = (s * t)/(1 + B + t^2)
-3. x1 = ((-1 + s) / 2) - t * w
-4. x2 = -1 - x1
-5. x3 = 1 + (1 / w^2)
-6. e = Legendre(t)
-7. If x1^3 + B is square, output (x1, e * sqrt(x1^3 + B) )
-8. If x2^3 + B is square, output (x2, e * sqrt(x2^3 + B) )
-9. Output (x3, e * sqrt(x3^3 + B))
+1.   u = hash2base(alpha)
+2.  x1 = u
+3. gx1 = x1^3 + B * x1
+2.  x2 = -x1
+3. gx2 = x2^3 + B * x2
+8. If gx1 is square, x = x1 and y = sqrt(gx1)
+9. If gx2 is square, x = x2 and y = sqrt(gx2)
+10. Output (x, y)
 ~~~
 
-**Implementation**
+#### Implementation
+
+The following procedure implements the Elligator2's algorithm for supersingular
+curves in a straight-line fashion.
+
+~~~
+map2curve_ell2A0(alpha)
+Input: alpha, an octet string to be hashed.
+Output: (x, y), a point on E.
+
+Steps:
+1.   u = hash2base(alpha)
+2.  x1 = u
+3. gx1 = x1^2
+4. gx1 = gx1 + B
+5. gx1 = gx1 + x1     // gx1 = x1^3 + B * x1
+6.  x2 = -x1
+7. gx2 = -gx1         // gx2 = x2^3 + B * x2
+8.   e = is_square(gx1, q)
+9.   x = CMOV(x2, x1, e)    // If e=True, x = x1, else x = x2
+10. gx = CMOV(gx2, gx1, e)  // If e=True, gx = gx1, else gx = gx2
+11.  y = sqrt(gx)
+12. Output (x, y)
+~~~
+
+## Encodings for Pairing-Friendly curves
+
+### Fouque-Tibouchi Method {#ftpairing}
+
+The map2curve_ft(alpha) implements the Fouque-Tibouchi's method {{FT12}} for
+elliptic curves defined by y^2 = x^3 + B. Notice that this encoding covers the
+case q=1 (mod 3) which is not handled by Boneh-Franklin's method, e.g., the
+SECP256K1 curve {{SEC2}}. In addition, this encoding covers pairing-friendly
+curves, such as BN {{BN05}}, KSS {{KSS08}}, and BLS {{BLS02}} curves.
+
+Preconditions: A Weierstrass curve over F such that q=7 (mod 12), and 1 + B is
+a non-zero square in F.
+
+Input: alpha, an octet string to be hashed.
+
+Constants: B, the constant of the Weierstrass curve; and S=sqrt(-3) in F.
+
+Output: (x, y), a point on E.
+
+Operations:
+
+~~~
+1.  u = hash2base(alpha)
+2. t1 = (S * u) / (1 + B + u^2)
+3. x1 = ((-1 + S) / 2) - u * t1
+4. x2 = -1 - x1
+5. x3 = 1 + (1 / t1^2)
+6.  e = u^((p-1) / 2)
+7. If x1^3 + B is square, set x = x1 and y = e * sqrt(x1^3 + B)
+8. If x2^3 + B is square, set x = x2 and y = e * sqrt(x2^3 + B)
+8. If x3^3 + B is square, set x = x3 and y = e * sqrt(x3^3 + B)
+9. Output (x, y)
+~~~
+
+#### Implementation
 
 The following procedure implements the Fouque-Tibouchi's algorithm in a
 straight-line fashion.
 
 ~~~
 map2curve_ft(alpha)
+Input: alpha, an octet string to be hashed.
+Output: (x, y), a point on E.
 
-Input:
-
-  alpha: an octet string to be encoded
-  B    : the constant of the curve
-
-Output:
-
-  (x, y): - a point in E
-
-Precomputations:
-
-1.  c1 = sqrt(-3)          // Field arithmetic
-2.  c2 = (-1 + c1) / 2     // Field arithmetic
+Constants:
+1. c1 = sqrt(-3)          
+2. c2 = (-1 + c1) / 2     
+3. c3 = ((q-1) / 2)    // Integer Arithmetic
 
 Steps:
-
-1.  t = hash2base(alpha)  // {0,1}^* -> Fp
-2.  k = t^2                // t^2
-3.  k = k + B + 1          // t^2 + B + 1
-4.  k = 1 / k              // 1 / (t^2 + B + 1)
-5.  k = k * t              // t / (t^2 + B + 1)
-6.  k = k * c1             // sqrt(-3) * t / (t^2 + B + 1)
-7.  x1 = c2 - t * k        // (-1 + sqrt(-3)) / 2 - sqrt(-3) * t^2 / (t^2 + B + 1)
-8.  x2 = -1 - x1
-9.  r = k^2
-10. r = 1 / r
-11. x3 = 1 + r
-12. fx1 = x1^3 + B
-12. fx2 = x2^3 + B
-12. s1 = Legendre(fx1)
-13. s2 = Legendre(fx2)
-14.  x = x3
-15.  x = CMOV(x2 ,x, s2 > 0)  // if s2=1, then x is set to x2
-16.  x = CMOV(x1, x, s1 > 0)  // if s1=1, then x is set to x1
-17.  y = x^3 + B
-18. t2 = Legendre(t)
-19.  y = t2 * sqrt(y)         // TODO: determine which root to choose
-20. Output (x, y)
+1.    u = hash2base(alpha)
+2.   t1 = u^2
+3.   t1 = t1 + B + 1
+4.   t1 = 1 / t1
+5.   t1 = t1 * u
+6.   t1 = t1 * c1      // t1 = sqrt(-3) * u / (u^2 + B + 1)
+7.   x1 = u * t1
+8.   x1 = c2 - x1      // x1 = (-1 + sqrt(-3)) / 2 - sqrt(-3) * u / (u^2 + B + 1)
+9.   x2 = -1 - x1      // x2 = -1 - x1
+10.  x3 = t1^2
+11.  x3 = 1 / x3
+12.  x3 = x3 + 1       // x3 = 1 + (1 / t1^2)
+13. gx1 = x1^3 + B
+14. gx2 = x2^3 + B
+15. gx3 = x3^3 + B
+16.  e1 = is_square(gx1, q)
+17.  e2 = is_square(gx2, q)
+18.   x = CMOV(x3, x2, e2)    // If e2=True, x = x2, else x = x3
+19.   x = CMOV(x, x1, e1)     // If e1=True, x = x1, else x = x
+20.  gx = CMOV(gx3, gx2, e2)  // If e2=True, gx = gx2, else gx = gx3
+21.  gx = CMOV(gx, gx1, e1)   // If e1=True, gx = gx1, else gx = gx
+22.   e = u^c3
+23.   y = e * sqrt(gx)
+24. Output (x, y)
 ~~~
-
-Additionally, `map2curve_ft(alpha)` can return the point `(c2, sqrt(1 + B))` when `u=0`.
 
 ## Encodings for Montgomery curves
 
@@ -992,7 +1042,7 @@ The map2curve_elligator2(alpha) implements the Elligator2 method from
 {{Elligator2}}.
 
 **Preconditions**
-
+Talk about only-x mapping
 Any curve of the form `y^2 = x^3 + A * x^2 + B * x`, which covers all Montgomery curves such
 that `A != 0` and `B = 1` (i.e. those curves with `j-invariant != 1728`).
 
