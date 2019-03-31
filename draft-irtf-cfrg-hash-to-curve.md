@@ -619,12 +619,12 @@ Steps:
 The generic interface for deterministic encoding functions to elliptic curves is as follows:
 
 ~~~
-P = map2curve(alpha)
+(x, y) = map2curve(alpha)
 ~~~
 
-where alpha is an octet string to be encoded as a point P on the curve. Observe
-that each encoding requires that certain conditions must hold in order to be
-applied.
+where alpha is an octet string to be hashed to a point on the curve with affine
+coordinates (x, y) defined over F. Observe that each encoding requires that
+certain algebraic conditions must hold in order to be applied.
 
 ## Notation
 
@@ -786,7 +786,7 @@ Steps:
 26.   x = CMOV(x, x1, e1)     // If e1=True, x = x1, else x = x
 27.  gx = CMOV(gx3, gx2, e2)  // If e2=True, gx = gx2, else gx = gx3
 28.  gx = CMOV(gx, gx1, e1)   // If e1=True, gx = gx1, else gx = gx
-29.   y = sqrt(gx)
+29.   y = sqrt(gx, q)
 30. Output (x, y)
 ~~~
 
@@ -849,7 +849,7 @@ Steps:
 17.   e = is_square(gx1, q)
 18.   x = CMOV(x2, x1, e)    // If e=True, x = x1, else x = x2
 19.  gx = CMOV(gx2, gx1, e)  // If e=True, gx = gx1, else gx = gx2
-20.   y = sqrt(gx)
+20.   y = sqrt(gx, q)
 21. Output (x, y)
 ~~~
 
@@ -900,10 +900,10 @@ Steps:
 6. Output (x, y)
 ~~~
 
-### Elligator2 Method
+### Elligator2A0 Method
 
-The map2curve_ell2A0(alpha) implements a derivation of the Elligator2 method
-{{Elligator2A0}} targeting supersingular curves defined by y^2 = x^3 + B\*x
+The map2curve_ell2A0(alpha) implements an adaptation of Elligator2
+{{Elligator2A0}} targeting the supersingular curves defined by y^2 = x^3 + B\*x
 over a field F such that q=3 (mod 4).
 
 Preconditions: A supersingular curve over F such that q=3 (mod 4).
@@ -942,13 +942,13 @@ Steps:
 2.  x1 = u
 3. gx1 = x1^2
 4. gx1 = gx1 + B
-5. gx1 = gx1 + x1     // gx1 = x1^3 + B * x1
+5. gx1 = gx1 * x1     // gx1 = x1^3 + B * x1
 6.  x2 = -x1
 7. gx2 = -gx1         // gx2 = x2^3 + B * x2
 8.   e = is_square(gx1, q)
 9.   x = CMOV(x2, x1, e)    // If e=True, x = x1, else x = x2
 10. gx = CMOV(gx2, gx1, e)  // If e=True, gx = gx1, else gx = gx2
-11.  y = sqrt(gx)
+11.  y = sqrt(gx, q)
 12. Output (x, y)
 ~~~
 
@@ -1024,7 +1024,7 @@ Steps:
 20.  gx = CMOV(gx3, gx2, e2)  // If e2=True, gx = gx2, else gx = gx3
 21.  gx = CMOV(gx, gx1, e1)   // If e1=True, gx = gx1, else gx = gx
 22.   e = u^c3
-23.   y = e * sqrt(gx)
+23.   y = e * sqrt(gx, q)
 24. Output (x, y)
 ~~~
 

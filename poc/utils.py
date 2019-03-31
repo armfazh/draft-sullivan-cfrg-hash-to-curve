@@ -66,7 +66,7 @@ def tv(label, v, len):
 class Ciphersuite:
     def __init__(self, label):
         (h2c_prefix, curve, hash_name, map_name, variant_name) = label.split("-")
-        self.curve = Curve(curve)
+        self.curve = ECurve(curve)
         self.hash = Hash(hash_name)
 
 class Hash:
@@ -78,20 +78,14 @@ class Hash:
         elif label == "SHA512":
             self.H = hashlib.sha512
         else:
-            raise ValueError("Hash %s is not recognized" % curve)
+            raise ValueError("Hash %s is not recognized" % label)
 
     def hbits(self):
         return self.H().digest_size * 8
 
-class Curve:
+class ECurve:
     def __init__(self, label):
-        if label == "Curve25519":
-            self.p = PrimeDict["P-255"]
-        elif label == "P256":
-            self.p = PrimeDict["P-256"]
-        elif label == "P384":
-            self.p = PrimeDict["P-384"]
-        elif label == "BN256":
-            self.p = PrimeDict["BN256"]
+        if PrimeDict.has_key(label):
+            self.p = PrimeDict[label]
         else:
-            raise ValueError("Curve %s is not recognized" % curve)
+            raise ValueError("Curve %s is not recognized" % label)

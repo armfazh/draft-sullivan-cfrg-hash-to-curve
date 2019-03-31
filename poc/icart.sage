@@ -3,7 +3,7 @@ from utils import *
 load("common.sage")
 
 # P384
-p = PrimeDict["P-384"]
+p = PrimeDict["P384"]
 m = 1
 q = p^m
 F = GF(q)

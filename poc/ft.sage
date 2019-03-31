@@ -12,7 +12,7 @@ B = F(3)
 E = EllipticCurve(F, [A,B])
 
 assert is_square(1+B) and (1+B) != F(0)
-assert q%3 == 1
+assert q%12 == 7
 
 h2c_suite = "H2C-BN256-SHA512-FT-"
 
