@@ -799,7 +799,7 @@ Preconditions: A Weierstrass curve over F such that A!=0, B!=0, and p=3 (mod 4).
 
 Input: alpha, an octet string to be hashed.
 
-Constants: A and B, the constants of the Weierstrass curve.
+Constants: A and B, the parameters of the Weierstrass curve.
 
 Output: (x,y), a point on E.
 
@@ -851,6 +851,146 @@ Steps:
 19.  gx = CMOV(gx2, gx1, e)  // If e=True, gx = gx1, else gx = gx2
 20.   y = sqrt(gx, q)
 21. Output (x, y)
+~~~
+
+## Encodings for Montgomery curves
+
+### Elligator2 Method {#elligator2}
+
+The map2curve_elligator2(alpha) implements the Elligator2 {{Elligator2}} for
+curves defined by y^2 = x^3 + A\*x^2 + B\*x such that A\*B\*(A^2 - 4\*B) != 0.
+In particular, this method applies to the Montgomery curves y^2 = x^3 + A\*x^2 + x
+setting B=1.
+
+Preconditions: A Montgomery curve  such that A!=0.
+
+Input: alpha, an octet string to be hashed.
+
+Constants: A and B, the parameters of the curve; N, a non-square in F.
+
+Output: (x, y), a point on E.
+
+Operations:
+
+~~~
+1.   u = hash2base(alpha)
+2.  x1 = -A / (1 + N * u^2)
+3. gx1 = x1^3 + A * x1^2 + B * x1
+4.  x2 = -x1 - A
+5. gx2 = x2^3 + A * x2^2 + B * x2
+6.   e = gx1^((q - 1) / 2)
+7. If is_square(gx1), set x = x1 and y = -e * sqrt(gx1)
+8. If is_square(gx2), set x = x2 and y = -e * sqrt(gx2)
+9. Output (x, y)
+~~~
+
+#### Implementation
+
+The following procedure implements elligator2 algorithm in a straight-line
+fashion.
+
+~~~
+map2curve_elligator2(alpha)
+Input: alpha, an octet string to be hashed.
+Output: (x, y), a point on E.
+
+Constants:  
+1. c1 is an non-square in F.
+2. c2 = (q - 1) / 2      // Integer arithmetic
+
+Steps:
+1.    u = hash2base(alpha)
+2.   x1 = u^2
+3.   x1 = c1 * x1        
+4.   x1 = x1 + 1
+5.   x1 = 1 / x1
+6.   x1 = A * x1
+7.   x1 = -x1            // x1 = -A / (1 + N * u^2)
+8.  gx1 = x1 + A
+9.  gx1 = gx1 * x1
+10. gx1 = gx1 + B
+11. gx1 = gx1 * x1       // gx1 = x1^3 + A * x1^2 + B * x1
+12.  x2 = -x1 - A        // x2 = -x1 - A
+13. gx2 = x2 + A
+14. gx2 = gx2 * x2
+15. gx2 = gx2 + B
+16. gx2 = gx2 * x2       // gx2 = x2^3 + A * x2^2 + B * x2
+17.   e = is_square(gx1, q)
+18.   x = CMOV(x2, x1, e)    // If e=True, x=x1, else x=x2
+19.  gx = CMOV(gx2, gx1, e)  // If e=True, x=gx1, else x=gx2
+20.  y2 = sqrt(gx, q)
+22.  y1 = -y2
+22.   y = CMOV(y2, y1, e)    // If e=True, y=y1, else y=y2
+23. Output (x, y)
+~~~
+
+## Encodings for Twisted Edwards curves
+
+### Elligator2 Method {#ell2edwards}
+
+The map2curve_ell2edwards(alpha) implements an adaptation of Elligator2 {{Elligator2}} for twisted Edwards curves defined by A\*x^2 + y^2 = 1 + D\*x^2y^2
+over a field F.
+
+Preconditions: A Twisted Edwards curve.
+
+Input: alpha, an octet string to be hashed.
+
+Constants: A and D, the parameters of the curve; N, a non-square in F.
+
+Output: (x,y), a point on E.
+
+Operations:
+
+~~~
+1.   u = hash2base(alpha)
+2.  x1 = -A / (1 + N * u^2)
+3. gx1 = x1^3 + A * x1^2 + B * x1
+4.  x2 = -x1 - A
+5. gx2 = x2^3 + A * x2^2 + B * x2
+6.   e = gx1^((q-1) / 2)
+7. If is_square(gx1), set x = x1 and y = -e * sqrt(gx1)
+8. If is_square(gx2), set x = x2 and y = -e * sqrt(gx2)
+9. Output (x,y)
+~~~
+
+#### Implementation
+
+The following procedure implements elligator2 algorithm in a straight-line
+fashion.
+
+~~~
+map2curve_elligator2(alpha)
+Input: alpha, an octet string to be hashed.
+Output: (x, y), a point on E.
+
+Constants:  
+1. c1 is an non-square in F.
+2. c2 = (q - 1) / 2      // Integer arithmetic
+
+Steps:
+1.    u = hash2base(alpha)
+2.   x1 = u^2
+3.   x1 = c1 * x1        
+4.   x1 = x1 + 1
+5.   x1 = 1 / x1
+6.   x1 = A * x1
+7.   x1 = -x1            // x1 = -A / (1 + N * u^2)
+8.  gx1 = x1 + A
+9.  gx1 = gx1 * x1
+10. gx1 = gx1 + B
+11. gx1 = gx1 * x1       // gx1 = x1^3 + A * x1^2 + B * x1
+12.  x2 = -x1 - A        // x2 = -x1 - A
+13. gx2 = x2 + A
+14. gx2 = gx2 * x2
+15. gx2 = gx2 + B
+16. gx2 = gx2 * x2       // gx2 = x2^3 + A * x2^2 + B * x2
+17.   e = is_square(gx1, q)
+18.   x = CMOV(x2, x1, e)    // If e=True, x=x1, else x=x2
+19.  gx = CMOV(gx2, gx1, e)  // If e=True, x=gx1, else x=gx2
+20.  y2 = sqrt(gx, q)
+22.  y1 = -y2
+22.   y = CMOV(y2, y1, e)    // If e=True, y=y1, else y=y2
+23. Output (x, y)
 ~~~
 
 ## Encodings for Supersingular curves
@@ -962,8 +1102,7 @@ case q=1 (mod 3) which is not handled by Boneh-Franklin's method, e.g., the
 SECP256K1 curve {{SEC2}}. In addition, this encoding covers pairing-friendly
 curves, such as BN {{BN05}}, KSS {{KSS08}}, and BLS {{BLS02}} curves.
 
-Preconditions: A Weierstrass curve over F such that q=7 (mod 12), and 1 + B is
-a non-zero square in F.
+Preconditions: A Weierstrass curve over F such that q=7 (mod 12).
 
 Input: alpha, an octet string to be hashed.
 
@@ -1027,114 +1166,6 @@ Steps:
 23.   y = e * sqrt(gx, q)
 24. Output (x, y)
 ~~~
-
-## Encodings for Montgomery curves
-
-A Montgomery curve is given by the following equation `E: B * y^2 = x^3 + A * x^2 + x`, where
-`B * (A^2 - 4) != 0`. Note that any curve with a point of order 2 is isomorphic to
-this representation. Also notice that `E` cannot have a prime order group, hence,
-a scalar multiplication by a cofactor is required to obtain a point in the main
-subgroup.
-
-### Elligator2 Method {#elligator2}
-
-The map2curve_elligator2(alpha) implements the Elligator2 method from
-{{Elligator2}}.
-
-**Preconditions**
-Talk about only-x mapping
-Any curve of the form `y^2 = x^3 + A * x^2 + B * x`, which covers all Montgomery curves such
-that `A != 0` and `B = 1` (i.e. those curves with `j-invariant != 1728`).
-
-**Examples**
-
-- Curve25519
-- Curve448
-
-**Algorithm**: map2curve_elligator2
-
-Input:
-
- - `alpha`: an octet string to be hashed.
- - `A,B=1`: the constants of the Montgomery curve.
- - `N`    : a constant non-square in the field.
-
-Output:
-
- - (x,y): a point in E.
-
-Operations:
-
-~~~
-1. Define g(x) = x(x^2 + Ax + B)
-2. u = hash2base(alpha)
-3. v = -A/(1 + N*u^2)
-4. e = Legendre(g(v))
-5.1. If u != 0, then
-5.2.    x = ev - (1 - e)A/2
-5.3.    y = -e*sqrt(g(x))
-5.4. Else, x=0 and y=0
-6. Output (x,y)
-~~~
-
-Here, e is the Legendre symbol defined as in {{utility}}.
-
-**Implementation**
-
-The following procedure implements elligator2 algorithm in a straight-line
-fashion.
-
-~~~
-map2curve_elligator2(alpha)
-
-Input:
-
-  alpha - value to be encoded, an octet string
-  A,B=1 - the constants of the Montgomery curve.
-  N - a constant non-square value in Fp.
-
-Output:
-
-  (x, y) - a point in E
-
-Precomputations:
-
-1. c1 = (p - 1)/2     // Integer arithmetic
-2. c2 = A / 2 (mod p) // Field arithmetic
-
-Steps:
-
-1.   u = hash2base(alpha)
-2.  t1 = u^2
-3.  t1 = N * t1
-4.  t1 = 1 + t1
-5.  t1 = t1^(-1)
-6.   v = A * t1
-7.   v = -v               // v = -A / (1 + N * u^2)
-8.  gv = v + A
-9.  gv = gv * v
-0.  gv = gv + B
-11. gv = gv * v           // gv = v^3 + Av^2 + Bv
-12.  e = gv^c1            // Legendre(gv)
-13.  x = e*v
-14. ne = -e
-15. t1 = 1 + ne
-16. t1 = t1 * c2
-17.  x = x - t1           // x = ev - (1 - e)*A/2
-18.  y = x + A
-19.  y = y * x
-20.  y = y + B
-21.  y = y * x
-22.  y = sqrt(y)
-23.  y = y * ne            // y = -e * sqrt(x^3 + Ax^2 + Bx)
-24.  x = CMOV(0, x, 1-u)
-25.  y = CMOV(0, y, 1-u)
-26. Output (x, y)
-~~~
-
-Elligator2 can be simplified with projective coordinates.
-
-((TODO: write this variant))
 
 # Random Oracles {#ffstv}
 

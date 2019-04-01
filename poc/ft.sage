@@ -2,19 +2,18 @@ from hash_to_base import *
 from utils import *
 load("common.sage")
 
-# BN256 curve
-p = PrimeDict["BN256"]
+# BLS12381 curve
+p = PrimeDict["BLS12381"]
 m = 1
 q = p^m
 F = GF(q)
 A = F(0)
-B = F(3)
+B = F(4)
 E = EllipticCurve(F, [A,B])
 
-assert is_square(1+B) and (1+B) != F(0)
-assert q%12 == 7
+assert q%12 == 7, "p not congruent to 7 mod 12"
 
-h2c_suite = "H2C-BN256-SHA512-FT-"
+h2c_suite = "H2C-BLS12381-SHA512-FT-"
 
 # Textbook implementation
 def fouquetibouchi(alpha):
@@ -45,7 +44,7 @@ ORDER_OVER_2   = ZZ((q - 1)/2)           # Integer arithmetic
 # Implementation
 def fouquetibouchi_slp(alpha):
     u = h2b_from_label(h2c_suite, alpha)
-    tv("u ", u, 32)
+    tv("u ", u, 48)
 
     t1 = u^2
     t1 = t1 + B + 1
@@ -53,30 +52,30 @@ def fouquetibouchi_slp(alpha):
     t1 = t1 * u
     t1 = t1 * SQRT_MINUS3
     assert t1 == F(sq_root(F(-3), q) * u / (u**2 + B + 1))
-    tv("t1", t1, 32)
+    tv("t1", t1, 48)
 
     x1 = u * t1
     x1 = ONE_SQRT3_DIV2 - x1
     assert x1 == F((-1 + sq_root(F(-3),q)) / 2 - sqrt(F(-3),q) * u**2 / (u**2 + B + 1))
-    tv("x1", x1, 32)
+    tv("x1", x1, 48)
 
     x2 = -1 - x1
     assert x2 == F(-1 - ((-1 + sqrt(F(-3),q)) / 2 - sqrt(F(-3),q) * u**2 / (u**2 + B + 1)))
-    tv("x2", x2, 32)
+    tv("x2", x2, 48)
 
     x3 = t1**2
     x3 = mult_inv(x3, q)
     x3 = x3 + 1
     assert x3 == F(1 + 1 / t1**2)
-    tv("x3", x3, 32)
+    tv("x3", x3, 48)
 
     e = u^ORDER_OVER_2
     assert e == legendre_symbol(u, q)
-    tv("e", e, 32)
+    tv("e", e, 48)
 
-    gx1 = x1^3+B
-    gx2 = x2^3+B
-    gx3 = x3^3+B
+    gx1 = x1^3 + B
+    gx2 = x2^3 + B
+    gx3 = x3^3 + B
     e1 = is_QR(gx1, q)
     e2 = is_QR(gx2, q)
 
@@ -87,10 +86,9 @@ def fouquetibouchi_slp(alpha):
     y = e * sq_root(gx, q)
     return E(x, y)
 
-
 if __name__ == "__main__":
     enable_debug()
-    print "## Fouque-Tibouchi to BN256"
+    print "## Fouque-Tibouchi to BLS12381"
     for alpha in map2curve_alphas:
         print "\n~~~"
         print("Input:")
@@ -104,6 +102,6 @@ if __name__ == "__main__":
         print("")
         print("Output:")
         print("")
-        tv("x", pB[0], 32)
-        tv("y", pB[1], 32)
+        tv("x", pB[0], 48)
+        tv("y", pB[1], 48)
         print "~~~"
