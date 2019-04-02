@@ -48,301 +48,444 @@ normative:
   SECG1:
     title: "SEC 1: Elliptic Curve Cryptography"
     target: http://www.secg.org/sec1-v2.pdf
+    date: May, 2009
     author:
       -
-        ins: Standards for Efficient Cryptography Group (SECG)
+        org: Standards for Efficient Cryptography Group (SECG)
   SEC2:
     title: "SEC 2: Recommended Elliptic Curve Domain Parameters"
     target: http://www.secg.org/sec2-v2.pdf
+    date: Jan, 2010
     author:
       -
-        ins: Standards for Efficient Cryptography Group (SECG)
+        org: Standards for Efficient Cryptography Group (SECG)
+  DSS:
+    title: Digital Signature Standard (DSS)
+    seriesinfo:
+        "In": FIPS PUB 186-4
+        DOI: 10.6028/NIST.FIPS.186-4
+    target: https://doi.org/10.6028/NIST.FIPS.186-4
+    date: July, 2013
+    author:
+      -
+        org: National Institute for Standards and Technology
   Icart09:
     title: How to Hash into Elliptic Curves
-    target: https://eprint.iacr.org/2009/226.pdf
+    seriesinfo:
+        "In": Advances in Cryptology - CRYPTO 2009
+        "pages": 303-316
+        DOI: 10.1007/978-3-642-03356-8_18
+    target: https://doi.org/10.1007/978-3-642-03356-8_18
+    date: 2009
     author:
       -
         ins: T. Icart
+        name: Thomas Icart
         org: Sagem Securite and Universite du Luxembourg
   FT12:
     title: Indifferentiable Hashing to Barreto-Naehrig Curves
-    seriesinfo: LATINCRYPT 2012, pages 1-17.
-    DOI: 10.1007/978-3-642-33481-8_1
+    seriesinfo:
+        "In": Progress in Cryptology - LATINCRYPT 2012
+        "pages": 1-7
+        DOI: 10.1007/978-3-642-33481-8_1
     target: https://doi.org/10.1007/978-3-642-33481-8_1
+    date: 2012
     author:
       -
-        ins: Pierre-Alain Fouque
+        ins: P. Fouque
+        name: Pierre-Alain Fouque
         org: Ecole Normale Superieure and INRIA Rennes
       -
-        ins: Mehdi Tibouchi
+        ins: M. Tibouchi
+        name: Mehdi Tibouchi
         org: NTT Secure Platform Laboratories
+  Adj2013:
+    title: Square Root Computation over Even Extension Fields
+    seriesinfo:
+        "In": IEEE Transactions on Computers. vol 63 issue 11
+        "pages": 2829-2841
+        DOI: 10.1109/TC.2013.145
+    target: https://doi.org/10.1109/TC.2013.145
+    date: Nov, 2014
+    author:
+     -
+        ins: G. Adj
+        name: Gora Adj
+        org: ISFA, Universite Claude Bernard Lyon 1, Villeurbanne, France
+     -
+        ins: F. Rodriguez-Henriquez
+        name: Francisco Rodriguez-Henriquez
+        org: CINVESTAV-IPN, San Pedro Zacatenco, Mexico City, Mexico.
+
   BN05:
     title: Pairing-Friendly Elliptic Curves of Prime Order
-    seriesinfo: Selected Areas in Cryptography 2005, pages 319-331.
-    DOI: 10.1007/11693383_22
+    seriesinfo:
+        "In": Selected Areas in Cryptography 2005
+        "pages": 319-331
+        DOI: 10.1007/11693383_22
     target: https://doi.org/10.1007/11693383_22
+    date: 2006
     author:
       -
+        ins: P. Barreto
         name: Paulo S. L. M. Barreto
         org: Escola Politecnica, Universidade de Sao Paulo, Sao Paulo, Brazil
       -
+        ins: M. Naehrig
         name: Michael Naehrig
         org: Lehrstuhl fur Theoretische Informationstechnik, Rheinisch-Westfalische Technische Hochschule Aachen, Aachen, Germany
   KSS08:
     title: Constructing Brezing-Weng Pairing-Friendly Elliptic Curves Using Elements in the Cyclotomic Field
-    seriesinfo: Pairing-Based Cryptography - Pairing 2008, pages 126-135
-    DOI: 10.1007/978-3-540-85538-5_9
+    seriesinfo:
+        "In": Pairing-Based Cryptography - Pairing 2008
+        "pages": 126-135        
+        DOI: 10.1007/978-3-540-85538-5_9
     target: https://doi.org/10.1007/978-3-540-85538-5_9
+    date: 2008
     author:
       -
-        name: "Ezekiel J. Kachisa"
+        ins: E. J. Kachisa
+        name: Ezekiel J. Kachisa
         org: School of Computing, Dublin City University, Ireland
       -
-        name: "Edward F. Schaefer"
+        ins: E. F. Schaefer
+        name: Edward F. Schaefer
         org: Department of Mathematics and Computer Science of Santa Clara University, USA
       -
-        name: "Michael Scott"
+        ins: M. Scott
+        name: Michael Scott
         org: School of Computing, Dublin City University, Ireland
   BF01:
     title: Identity-based encryption from the Weil pairing
-    seriesinfo: Advances in Cryptology - CRYPTO 2001, pages 213-229
+    seriesinfo:
+        "In": Advances in Cryptology - CRYPTO 2001
+        "pages": 213-229
+        DOI: 10.1007/3-540-44647-8_13
     target: https://doi.org/10.1007/3-540-44647-8_13
+    date: Aug, 2001
     author:
       -
+        ins: D. Boneh
         name: Dan Boneh
         org: Stanford University
       -
+        ins: M. Franklin
         name: Matthew Franklin
         org: UC Davis
   BLS01:
     title: Short signatures from the Weil pairing
-    seriesinfo: Journal of Cryptology, v17, pages 297-319
-    DOI: 10.1007/s00145-004-0314-9
+    seriesinfo:
+        "In": Journal of Cryptology, vol 17
+        "pages": 297-319
+        DOI: 10.1007/s00145-004-0314-9
     target: https://doi.org/10.1007/s00145-004-0314-9
+    date: Jul, 2004
     author:
       -
+        ins: D. Boneh
         name: Dan Boneh
         org: Stanford University
       -
+        ins: B. Lynn
         name: Ben Lynn
         org: Stanford University
       -
+        ins: H. Shacham
         name: Hovav Shacham
         org: Stanford University
   BLS02:
     title: Constructing Elliptic Curves with Prescribed Embedding Degrees
-    seriesinfo: Security in Communication Networks
-    DOI: 10.1007/3-540-36413-7_19
+    seriesinfo:
+        "In": Security in Communication Networks
+        "pages": 257-267
+        DOI: 10.1007/3-540-36413-7_19
     target: https://doi.org/10.1007/3-540-36413-7_19
+    date: 2003
     author:
       -
+        ins: P. Barreto
         name: Paulo S. L. M. Barreto
         org: Universidade de Sao Paulo, Brazil
       -
+        ins: B. Lynn
         name: Ben Lynn
         org: Stanford University
       -
+        ins: M. Scott
         name: Michael Scott
         org: Dublin City University, Ireland
   BMP00:
     title: Provably secure password-authenticated key exchange using Diffie-Hellman
-    venue: EUROCRYPT, pages 156-171, 2000.
+    seriesinfo:
+        "In": Advances in Cryptology - EUROCRYPT 2000
+        "pages": 156-171
+        DOI: 10.1007/3-540-45539-6_12
+    target: https://doi.org/10.1007/3-540-45539-6_12
+    date: May, 2000
     author:
       -
-        ins: Victor Boyko
+        ins: V. Boyko
+        name: Victor Boyko
         org: MIT Laboratory for Computer Science
       -
-        ins: Philip D. MacKenzie
+        ins: P. D. MacKenzie
+        name: Philip D. MacKenzie
         org: Bell Laboratories, Lucent Technologies
       -
-        ins: Sarvar Patel
+        ins: S. Patel
+        name: Sarvar Patel
         org: Bell Laboratories, Lucent Technologies
-  DSS:
-       title: "Digital Signature Standard, version 4"
-       date: 2013
-       author:
-         org: National Institute of Standards and Technology, U.S. Department of Commerce
-       seriesinfo:
-         NIST: FIPS PUB 186-4
   Jablon96:
     title: Strong password-only authenticated key exchange
-    venue: SIGCOMM Comput. Commun. Rev., 26(5), 5-26, 1996.
-    authors:
+    seriesinfo:
+        "In": SIGCOMM Computer Communication Review, vol 26 issue 5
+        "pages": 5-26
+        DOI: 10.1145/242896.242897
+    target: https://doi.org/10.1145/242896.242897
+    date: 1996
+    author:
       -
-        ins: David P. Jablon
+        ins: D. P. Jablon
+        name: David P. Jablon
         org: Integrity Sciences, Inc. Westboro, MA.
   hacspec:
     title: hacspec
     target: https://github.com/HACS-workshop/hacspec
+    date: Jan, 2019
   ElligatorAGL:
     title: Implementing Elligator for Curve25519
     target: https://www.imperialviolet.org/2013/12/25/elligator.html
-    authors:
+    author:
       -
-        ins: Adam Langley
+        ins: A. Langley
+        name: Adam Langley
+    date: 2013
   ECOPRF:
     title: EC-OPRF - Oblivious Pseudorandom Functions using Elliptic Curves
-    authors:
+    seriesinfo:
+        "In": Cryptology ePrint archive vol 2017 issue 111
+    target: https://eprint.iacr.org/2017/111
+    date: 2017
+    author:
       -
-        ins: Jonathan Burns
+        ins: J. Burns
+        name: Jonathan Burns
         org: Ionic Research
       -
-        ins: Daniel Moore
+        ins: D. Moore
+        name: Daniel Moore
         org: Ionic Research
       -
-        ins: Katrina Ray
+        ins: K. Ray
+        name: Katrina Ray
         org: Ionic Research
       -
-        ins: Ryan Speers
+        ins: R. Speers
+        name: Ryan Speers
         org: Ionic Research
       -
-        ins: Brian Vohaska
+        ins: B. Vohaska
+        name: Brian Vohaska
         org: Ionic Research
   Elligator2:
-    title: Elligator -- Elliptic-curve points indistinguishable from uniform random strings
-    venue: Proceedings of the 2013 ACM SIGSAC conference on Computer & communications security. ACM, 2013.
-    target: https://dl.acm.org/ft_gateway.cfm?id=2516734&type=pdf
-    authors:
+    title: Elligator - elliptic-curve points indistinguishable from uniform random strings
+    seriesinfo:
+        "In": Proceedings of the 2013 ACM SIGSAC conference on computer and communications security.
+        "pages": 967-980
+        DOI: 10.1145/2508859.2516734
+    target: https://doi.org/10.1145/2508859.2516734
+    date: Nov, 2013
+    author:
       -
-        ins: Daniel J. Bernstein
+        ins: D. J. Bernstein
+        name: Daniel J. Bernstein
         org: Department of Computer Science, University of Illinois at Chicago, USA
       -
-        ins: Mike Hamburg
+        ins: M. Hamburg
+        name: Mike Hamburg
         org: Cryptography Research, a division of Rambus, USA
       -
-        ins: Anna Krasnova
+        ins: A. Krasnova
+        name: Anna Krasnova
         org: Privacy & Identity lab, Institute for Computing and Information Sciences, Radboud University Nijmegen, The Netherlands
       -
-        ins: Tanja Lange
+        ins: T. Lange
+        name: Tanja Lange
         org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
   Elligator2A0:
-    title: "Quantum circuits for the CSIDH: optimizing quantum evaluation of isogenies"
-    venue: Advances in Cryptology - EUROCRYPT 2019.
-    target: https://eprint.iacr.org/2018/1059
-    authors:
+    title: Quantum circuits for the CSIDH optimizing quantum evaluation of isogenies
+    seriesinfo:
+        "In": Advances in Cryptology - EUROCRYPT 2019
+        DOI: 10.1007/978-3-030-17656-3
+    target: https://doi.org/10.1007/978-3-030-17656-3
+    date: 2019
+    author:
       -
-        ins: Daniel J. Bernstein
+        ins: D. J. Bernstein
+        name: Daniel J. Bernstein
         org: Department of Computer Science, University of Illinois at Chicago, USA
       -
-        ins: Tanja Lange
+        ins: T. Lange
+        name: Tanja Lange
         org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
       -
-        ins: Chloe Martindale
+        ins: C. Martindale
+        name: Chloe Martindale
         org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
       -
-        ins: Lorenz Panny
+        ins: L. Panny
+        name: Lorenz Panny
         org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
   SW06:
     title: Construction of rational points on elliptic curves over finite fields
-    venue: ANTS, volume 4076 of Lecture Notes in Computer Science, pages 510-524. Springer, 2006.
-    authors:
+    seriesinfo:
+        "In": Algorithmic Number Theory. ANTS 2006.
+        "pages": 510-524
+        DOI: 10.1007/11792086_36
+    target: https://doi.org/10.1007/11792086_36
+    date: 2006
+    author:
       -
-        ins: Andrew Shallue
+        ins: A. Shallue
+        name: Andrew Shallue
+        org: Mathematics Department, University of Wisconsin-Madison. Madison, USA.
       -
-        ins: Christiaan van de Woestijne
+        ins: C. Woestijne
+        name: Christiaan van de Woestijne
+        org: Mathematisch Instituut, Universiteit Leiden. Leiden, The Netherlands.
   SWU07:
     title: Rational points on certain hyperelliptic curves over finite fields
-    target: https://arxiv.org/pdf/0706.1448
-    authors:
+    seriesinfo:
+        "In": Bulletin Polish Acad. Sci. Math. vol 55
+        "pages": 97-104
+        DOI: 10.4064/ba55-2-1
+    target: https://doi.org/10.4064/ba55-2-1
+    date: 2007
+    author:
       -
-        ins: Maciej Ulas
-        org:
-  SimpleSWU:
+        ins: M. Ulas
+        name: Maciej Ulas
+        org: Institute of Mathematics, Jagiellonian University. Poland
+  Br01:
     title: Efficient Indifferentiable Hashing into Ordinary Elliptic Curves
-    venue: Annual Cryptology Conference (pp. 237-254). Springer, Berlin, Heidelberg.
-    target: https://eprint.iacr.org/2009/340.pdf
-    authors:
+    seriesinfo:
+        "In": Advances in Cryptology - CRYPTO 2010
+        "pages": 237-254
+        DOI: 10.1007/978-3-642-14623-7_13
+    target: https://doi.org/10.1007/978-3-642-14623-7_13
+    date: 2010
+    author:
       -
-        ins: Eric Brier
+        ins: E. Brier
+        name: Eric Brier
         org: Ingenico
       -
-        ins: Jean-Sebastien Coron
+        ins: J. S. Coron
+        name: Jean-Sebastien Coron
         org: Universite du Luxembourg
       -
-        ins: Thomas Icart
+        ins: T. Icart
+        name: Thomas Icart
         org: Universite du Luxembourg
       -
-        ins: David Madore
+        ins: D. Madore
+        name: David Madore
         org: TELECOM-ParisTech
       -
-        ins: Hugues Randriam
+        ins: H. Randriam
+        name: Hugues Randriam
         org: TELECOM-ParisTech
       -
-        ins: Mehdi Tibouchi
+        ins: M. Tibouchi
+        name: Mehdi Tibouchi
         org: Universite du Luxembourg, Ecole normale superieure
   FFSTV13:
     title: Indifferentiable deterministic hashing to elliptic and hyperelliptic curves
-    authors:
-      -
-        ins: Reza R. Farashahi
-        org: Macquarie Universit
-      -
-        ins: Pierre-Alain Fouque
-        org: Ecole normale superieure
-      -
-        ins: gor E. Shparlinski
-        org: Macquarie Universit
-      -
-        ins: Mehdi Tibouch
-        org: Ecole normale superieure
-      -
-        ins:  J. Felipe Voloch
-        org: University of Texas
-  BL07:
-    title: Faster addition and doubling on elliptic curves
-    venue: Proceedings of the Advances in Crypotology 13th international conference on Theory and application of cryptology and information security (ASIACRYPT'07), Kaoru Kurosawa (Ed.). Springer-Verlag, Berlin, Heidelberg, 29-50.
-    target: https://eprint.iacr.org/2007/286.pdf
-    authors:
-      -
-        ins: Daniel J. Bernstein
-        org: Department of Computer Science, University of Illinois at Chicago, USA
-      -
-        ins: Tanja Lange
-        org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
-
-  BL17:
-    title: Montgomery curves and the Montgomery ladder
-    target: https://eprint.iacr.org/2017/293.pdf
-    authors:
-      -
-        ins: Daniel J. Bernstein
-        org: Department of Computer Science, University of Illinois at Chicago, USA
-      -
-        ins: Tanja Lange
-        org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
-
-  FIPS-186-4:
-    title: Digital Signature Standard (DSS), FIPS PUB 186-4, July 2013
-    target: https://csrc.nist.gov/publications/detail/fips/186/4/final
+    seriesinfo:
+        "In": Math. Comp. vol 82
+        "pages": 491-512
+        DOI: 10.1090/S0025-5718-2012-02606-8
+    target: https://doi.org/10.1090/S0025-5718-2012-02606-8
+    date: 2013
     author:
       -
-        ins: National Institute for Standards and Technology
-        org:
-
-  github-repo:
-    title: draft-irtf-cfrg-hash-to-curve | github.com
-    target: https://github.com/chris-wood/draft-irtf-cfrg-hash-to-curve/
-
-  SAGE:
-    title: SageMath, the Sage Mathematics Software System
-    authors: The Sage Developers
-    target: https://www.sagemath.org
-
+        ins: R. R. Farashahi
+        name: Reza R. Farashahi
+        org: Macquarie Universit
+      -
+        ins: P. A. Fouque
+        name: Pierre-Alain Fouque
+        org: Ecole normale superieure
+      -
+        ins: I. E. Shparlinski
+        name: Igor E. Shparlinski
+        org: Macquarie Universit
+      -
+        ins: M. Tibouch
+        name: Mehdi Tibouch
+        org: Ecole normale superieure
+      -
+        ins: J. F. Voloch
+        name: J. Felipe Voloch
+        org: University of Texas
   Schoof85:
     title: Elliptic Curves Over Finite Fields and the Computation of Square Roots mod p
-    authors: Rene Schoof
-    target: https://www.ams.org/journals/mcom/1985-44-170/S0025-5718-1985-0777280-6/S0025-5718-1985-0777280-6.pdf
+    seriesinfo:
+        "In": Mathematics of Computation vol 44 issue 170
+        "pages": 483-494
+        DOI: 10.1090/S0025-5718-1985-0777280-6
+    target: https://doi.org/10.1090/S0025-5718-1985-0777280-6
+    date: Apr, 1985
+    author:
+      -
+        ins: R. Schoof
+        name: Rene Schoof
+  BL07:
+    title: Faster addition and doubling on elliptic curves
+    seriesinfo:
+        "In": Advances in Cryptology - ASIACRYPT 2007
+        "pages": 29-50
+        DOI: 10.1007/978-3-540-76900-2_3
+    target: https://doi.org/10.1007/978-3-540-76900-2_3
+    date: 2007
+    author:
+      -
+        ins: D. J. Bernstein
+        name: Daniel J. Bernstein
+        org: Department of Computer Science, University of Illinois at Chicago, USA
+      -
+        ins: T. Lange
+        name: Tanja Lange
+        org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
+  BL17:
+    title: Montgomery curves and the Montgomery ladder
+    seriesinfo:
+        "In": Topics in Computational Number Theory Inspired by Peter L. Montgomery
+        "pages": 82-115
+        DOI: 10.1017/9781316271575.005
+    target: https://doi.org/10.1017/9781316271575.005
+    date: Oct, 2017
+    author:
+      -
+        ins: D. J. Bernstein
+        name: Daniel J. Bernstein
+        org: Department of Computer Science, University of Illinois at Chicago, USA
+      -
+        ins: T. Lange
+        name: Tanja Lange
+        org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
+  github-repo:
+    title: draft-irtf-cfrg-hash-to-curve | github.com
+    target: https://github.com/chris-wood/draft-irtf-cfrg-hash-to-curve
+    date: 2019
+  SAGE:
+    title: SageMath, the Sage Mathematics Software System
+    author:
+      -
+        org: The Sage Developers
+    target: https://www.sagemath.org
+    date: 2019
 
-  Adj2013:
-    title: Square Root Computation over Even Extension Fields
-    authors:
-     -
-       name: Gora Adj
-       org: ISFA, Universite Claude Bernard Lyon 1, Villeurbanne, France
-     -
-       name: Francisco Rodriguez-Henriquez
-       org: CINVESTAV-IPN, San Pedro Zacatenco, Mexico City, Mexico.
-    target: https://doi.org/10.1109/TC.2013.145
 
 --- abstract
 
@@ -422,71 +565,63 @@ Summary of quantities:
 | r | Order of a prime subgroup of E. | If n is not prime, may need mapping to points in a subgroup of order r. |
 | h | Cofactor, h>=1. | For mapping to subgroup, need to multiply by cofactor. |
 
-## Terminology {#terminology}
-
-In the following, we categorize the terminology for mapping bitstrings to
-points on elliptic curves.
+## Terminology
+In the following, we categorize the terminology for mapping bitstrings to points
+on elliptic curves.
 
 ### Encoding {#term-encoding}
 
 In practice, the input of a given cryptographic algorithm will be a bitstring of
 arbitrary length, denoted {0, 1}^\*. Hence, a concern for virtually all protocols
-involving elliptic curves is how to convert this input into a curve point.
-The general term "encoding" refers to the process of producing an
-elliptic curve point given as input a bitstring. In some protocols, the original
-message may also be recovered through a decoding procedure. An encoding may be deterministic
-or probabilistic, although the latter is problematic in potentially leaking
-plaintext information as a side-channel.
+involving elliptic curves is how to convert this input into a point on the curve.
+The general term "encoding" refers to the process of producing an elliptic curve
+point given as input a bitstring. In some protocols, the original message may
+also be recovered through a decoding procedure. An encoding may be deterministic
+or probabilistic, although the latter is a potential source of plaintext
+information leakage in face of side-channel attacks.
 
-Suppose as the input to the encoding function we wish to use a fixed-length
-bitstring of length L. Comparing sizes of the sets, 2^L and n,
-an encoding function cannot be both deterministic and bijective.
-We can instead use an injective encoding from {0, 1}^L to E, with
-`L < log2(n)- 1`,  which is a bijection over a subset of points in E.
-This ensures that encoded plaintext messages can be recovered.
+Suppose that the input of the encoding function is a bitstring of fixed-length
+L. Comparing sizes of the sets, 2^L and n, an encoding function cannot be both
+deterministic and bijective. Alternatively, an injective encoding from {0, 1}^L
+to E can be used, such that L < log2(n) - 1, which is a bijection over a subset
+of points on E. This ensures that encoded plaintext messages can be recovered.
 
-In practice, encodings are commonly injective and invertible. Injective encodings map
-inputs to a subset of points on the curve. Invertible encodings allow computation of
-input bitstrings given a point on the curve.
+In practice, encodings are commonly injective and invertible. Injective
+encodings map inputs to a subset of points on the curve. Invertible encodings
+allow computation of input bitstrings given a point on the curve.
 
 ### Serialization {#term-serialization}
 
-A related issue is the conversion of an elliptic curve point to a bitstring. We
-refer to this process as "serialization", since it is typically used for
-compactly storing and transporting points, or for producing canonicalized
-outputs. Since a deserialization algorithm can often be used as a type of
-encoding algorithm, we also briefly document properties of these functions.
-
-A straightforward serialization algorithm maps a point (x, y) on E to a bitstring of length
-2\*log(p), given that x and y are both elements in GF(p). However, since
-there are only n points in E (with n approximately equal to p), it is possible
-to serialize to a bitstring of length log(n). For example, one common method
-is to store the x-coordinate and a single bit to determine whether the point
-is (x, y) or (x, -y), thus requiring log(p)+1 bits. This method reduces storage,
-but adds computation, since the deserialization process must recover the y
-coordinate.
+A related task is the conversion of an elliptic curve point to a bitstring,
+hereafter referred as "serialization", which is typically used for compactly
+storing and transporting points. For example, in {{SECG1}} there is a standard
+method for serializing points. Some applications have instantiated encoding
+algorithms using this deserialization method. However, this approach fails
+on bit strings that were not generated using the serialization procedure.
 
 ### Random Oracle {#term-rom}
 
-It is often the case that the output of the encoding function {{term-encoding}}
-should be (a) distributed uniformly at random on the elliptic curve and (b) non-invertible.
-That is, there is no discernible relation existing between outputs that can be computed
-based on the inputs. Moreover, given such an encoding function H from bitstrings to
-points on the curve, as well as a single point y, it is computationally intractable to
-produce an input x that maps to a y via H. In practice, these requirement stem from needing
-a random oracle which outputs elliptic curve points: one way to construct this is by first
-taking a regular random oracle, operating entirely on bitstrings, and applying a
-suitable encoding function to the output.
+Cryptographic protocols which are proven secure in the random oracle model (ROM)
+often require a hash function that behaves as a random oracle, i.e., that its
+response be uniformly distributed on the set of outputs (uniformity property).
 
-This motivates the term "hashing to the curve", since cryptographic hash
-functions are typically modeled as random oracles. However, this still leaves open
-the question of what constitutes a suitable encoding method, which is a primary
-concern of this document.
+Instantiating one of these protocols with an elliptic curve group motivates
+the term "hashing to the curve", i.e. mapping bitstrings to points on the
+elliptic curve. This function can be easily accomplished by using the output of
+a cryptographically secure hash function H as the input of an encoding function
+f.
 
-A random oracle onto an elliptic curve can also be instantiated using
-direct constructions, however these tend to rely on many group operations
-and are less efficient than hash and encode methods.
+~~~
+hash2curve(alpha) := f(H(alpha))
+~~~
 
+On the one hand, this function is not invertible since it is computationally
+intractable to produce an input alpha that maps to hash2curve(alpha) due to H is
+pre-image resistant.
+On the other hand, the uniformity property is not met as the output of an
+encoding is distinguishable from a random distribution. Hence, this function is
+not sufficient to get uniformity, but it can be used as a building block as
+described in {{rom}}.
 
 # Algorithm Recommendations {#recommendations}
 
@@ -499,7 +634,7 @@ The following table lists recommended algorithms for different curves and mappin
 a suitable algorithm, choose the mapping associated with the target curve. For example,
 Elligator2 is the recommended injective encoding function for Curve25519, whereas Simple SWU
 is the recommended injective encoding for P-256. Similarly, the FFSTV Random Oracle construction
-described in {{ffstv}} composed with Elligator2 should be used for Random Oracle mappings
+described in {{rom}} composed with Elligator2 should be used for Random Oracle mappings
 to Curve25519. When the required mapping is not clear, applications SHOULD use a Random Oracle.
 
 | Curve | Encoding | Section |
@@ -549,11 +684,6 @@ Algorithms in this document make use of utility functions described below.
   thus, given a bitstring C, the desired selector c can be computed by OR-ing
   all bits of C together. The resulting selector will be either 0 if all bits
   of C are zero, or 1 if at least one bit of C is 1.
-
-- CTEQ(a, b): Given two bitstrings of the same length, CTEQ returns True
-  whenever a is equal to b, otherwise returns False. Like CMOV, this operation
-  must be implemented in constant time with respect to their values and their
-  length.
 
 - I2OSP and OS2IP: These functions are used to convert an octet string to
   and from a non-negative integer {{RFC8017}}.
@@ -793,7 +923,7 @@ Steps:
 ### Simplified SWU Method {#simple-swu}
 
 The map2curve_simple_swu(alpha) implements a simplified version of
-Shallue-Woestijne-Ulas algorithm given by Brier et al. {{SimpleSWU}}.
+Shallue-Woestijne-Ulas algorithm given by Brier et al. {{Br01}}.
 
 Preconditions: A Weierstrass curve over F such that A!=0, B!=0, and p=3 (mod 4).
 
@@ -924,73 +1054,77 @@ Steps:
 23. Output (x, y)
 ~~~
 
-## Encodings for Twisted Edwards curves
+## Encodings for twisted Edwards curves
 
 ### Elligator2 Method {#ell2edwards}
 
-The map2curve_ell2edwards(alpha) implements an adaptation of Elligator2 {{Elligator2}} for twisted Edwards curves defined by A\*x^2 + y^2 = 1 + D\*x^2y^2
+The map2curve_ell2edwards(alpha) implements an adaptation of Elligator2
+{{Elligator2}} for twisted Edwards curves defined by A\*x^2 + y^2 = 1 + D\*x^2y^2
 over a field F.
 
 Preconditions: A Twisted Edwards curve.
 
 Input: alpha, an octet string to be hashed.
 
-Constants: A and D, the parameters of the curve; N, a non-square in F.
+Constants: A and D, the parameters of the curve; c0, a non-square in F;
+c1 = 2 * (A + D) / (A - D).
 
 Output: (x,y), a point on E.
 
 Operations:
 
 ~~~
-1.   u = hash2base(alpha)
-2.  x1 = -A / (1 + N * u^2)
-3. gx1 = x1^3 + A * x1^2 + B * x1
-4.  x2 = -x1 - A
-5. gx2 = x2^3 + A * x2^2 + B * x2
-6.   e = gx1^((q-1) / 2)
-7. If is_square(gx1), set x = x1 and y = -e * sqrt(gx1)
-8. If is_square(gx2), set x = x2 and y = -e * sqrt(gx2)
-9. Output (x,y)
+1.  u = hash2base(alpha)
+2. t1 = -c1 / (1 + c0 * u^2)
+3. t2 = -t1 - c1
+4. g1 = t1^3 + c1 * t1^2 + t1
+5. If is_square(g1), set t = t1, else t = t2
+6. y = (t - 1) / (t + 1)
+7. x = sq_root((y^2 - 1) / (D * y^2 - A), q)
+8. Output (x, y)
 ~~~
 
 #### Implementation
 
-The following procedure implements elligator2 algorithm in a straight-line
+The following procedure implements elligator2 method in a straight-line
 fashion.
 
 ~~~
-map2curve_elligator2(alpha)
+map2curve_ell2edwards(alpha)
 Input: alpha, an octet string to be hashed.
 Output: (x, y), a point on E.
 
 Constants:  
-1. c1 is an non-square in F.
-2. c2 = (q - 1) / 2      // Integer arithmetic
+1. c0 is an non-square in F.
+2. c1 = 2 * (A + D) / (A - D).
 
 Steps:
-1.    u = hash2base(alpha)
-2.   x1 = u^2
-3.   x1 = c1 * x1        
-4.   x1 = x1 + 1
-5.   x1 = 1 / x1
-6.   x1 = A * x1
-7.   x1 = -x1            // x1 = -A / (1 + N * u^2)
-8.  gx1 = x1 + A
-9.  gx1 = gx1 * x1
-10. gx1 = gx1 + B
-11. gx1 = gx1 * x1       // gx1 = x1^3 + A * x1^2 + B * x1
-12.  x2 = -x1 - A        // x2 = -x1 - A
-13. gx2 = x2 + A
-14. gx2 = gx2 * x2
-15. gx2 = gx2 + B
-16. gx2 = gx2 * x2       // gx2 = x2^3 + A * x2^2 + B * x2
-17.   e = is_square(gx1, q)
-18.   x = CMOV(x2, x1, e)    // If e=True, x=x1, else x=x2
-19.  gx = CMOV(gx2, gx1, e)  // If e=True, x=gx1, else x=gx2
-20.  y2 = sqrt(gx, q)
-22.  y1 = -y2
-22.   y = CMOV(y2, y1, e)    // If e=True, y=y1, else y=y2
-23. Output (x, y)
+1.   u = hash2base(alpha)
+2.  t1 = u^2
+3.  t1 = c0 * t1
+4.  t1 = t1 + 1
+5.  t1 = 1 / t1
+6.  t1 = t1 * c1
+7.  t1 = -t1                // t1 = -c1 / (1 + c0 * u^2)
+8.  t2 = -t1 - c1           // t2 = -x1 - c1
+9.  g1 = t1 + c1
+10. g1 = g1 * t1
+11. g1 = g1 + 1
+12. g1 = g1 * t1            // g1 = t1^3 + c1 * t1^2 + t1
+13.  e = is_square(g1, q)
+14. t3 = CMOV(t2, t1, e)    // If e=True, t=t1, else t=t2
+15. t4 = t3 + 1
+16. t4 = 1 / t4
+17.  y = t3 - 1
+18.  y = y * t4
+19. t5 = y^2
+20. gx = t5 * D
+21. gx = gx - A
+22. gx = 1 / gx
+23. t5 = t5 - 1
+24. gx = gx * t5
+25.  x = sq_root(gx, q)
+26. Output (x, y)
 ~~~
 
 ## Encodings for Supersingular curves
@@ -1167,41 +1301,36 @@ Steps:
 24. Output (x, y)
 ~~~
 
-# Random Oracles {#ffstv}
+# Random Oracles {#rom}
 
-Some applications require a Random Oracle (RO) of points, which can be constructed
-from deterministic encoding functions. Farashahi et al. {{FFSTV13}} showed a
-generic mapping construction that is indistinguishable from a random oracle.
-In particular, let `f : {0,1}^* -> E(F)` be a deterministic encoding function,
-and let `H0` and `H1` be two hash functions modeled as random oracles that map
-bit strings to elements in the field `F`, i.e., `H0,H1 : {0,1}* -> F`. Then,
-the `hash2curveRO(alpha)` mapping is defined as
+A random oracle onto an elliptic curve can be instantiated using some
+general constructions. For example, in {{Br01}} was proven a construction
+for obtaining a random oracle, however it requires a scalar point multiplication
+which is an expensive operation.
+
+A better approach to get uniformity was showed by Farashahi et al. [FFSTV13].
+Such a construction is defined as follows
 
 ~~~
-hash2curveRO(alpha) = f(H0(alpha)) + f(H1(alpha))
+   hash2curveRO(alpha) = f(H0(alpha)) + f(H1(alpha))
 ~~~
 
-where alpha is an octet string to be encoded as a point on a curve.
+where f: F -> E is a deterministic encoding function; and H0 and H1 are hash
+functions modeled as random oracles mapping bitstrings to elements in a field F.
 
 ## Interface
 
-Using the deterministic encodings from {{encodings}}, the `hash2curveRO(alpha)`
-mapping can be instantiated as
+Using the deterministic encodings from {{encodings}}, the random oracle recommended
+is instantiated as
 
 ~~~
-hash2curveRO(alpha) = hash2curve(alpha || 0x02) + hash2curve(alpha || 0x03)
+ hash2curveRO(alpha) = hash2curve(alpha || I2OSP(0x02, 1) )
+                     + hash2curve(alpha || I2OSP(0x03, 1) )
 ~~~
 
-where the addition operation is performed as a point addition.
+where the addition operation is performed as a point addition on the
+curve.
 
-# Curve Transformations
-
-Every elliptic curve can be converted to an equivalent curve in short Weierstrass form
-({{BL07}} Theorem 2.1), making SWU a generic algorithm that can be used for all curves.
-Curves in either Edwards or Twisted Edwards form can be transformed into equivalent
-curves in Montgomery form {{BL17}} for use with Elligator2.
-{{RFC7748}} describes how to convert between points on Curve25519 and Ed25519,
-and between Curve448 and its Edwards equivalent, Goldilocks.
 
 # Ciphersuites
 
@@ -1225,8 +1354,8 @@ This document describes the following set of ciphersuites:
 * H2C-BN256-SHA512-FT-
 * H2C-Curve25519-SHA512-Elligator2-Clear
 * H2C-Curve448-SHA512-Elligator2-Clear
-* H2C-Curve25519-SHA512-Elligator2-FFSTV
-* H2C-Curve448-SHA512-Elligator2-FFSTV
+* H2C-Curve25519-SHA512-Elligator2-ROM
+* H2C-Curve448-SHA512-Elligator2-ROM
 
 H2C-P256-SHA256-SSWU- is defined as follows:
 
@@ -1274,11 +1403,11 @@ H2C-Curve448-SHA512-Elligator2-Clear is defined as follows:
   N = -1.
 * The final output is multiplied by the cofactor of Curve448, 4.
 
-H2C-Curve25519-SHA512-Elligator2-FFSTV is defined as in H2C-Curve25519-SHA-512-Elligator2-Clear
-except HashToCurve is defined to be {#ffstv} where F is {#elligator2}.
+H2C-Curve25519-SHA512-Elligator2-ROM is defined as in H2C-Curve25519-SHA-512-Elligator2-Clear
+except HashToCurve is defined to be {#rom} where F is {#elligator2}.
 
-H2C-Curve448-SHA512-Elligator2-FFSTV is defined as in H2C-Curve448-SHA-512-Elligator2-Clear
-except HashToCurve is defined to be {#ffstv} where F is {#elligator2}.
+H2C-Curve448-SHA512-Elligator2-ROM is defined as in H2C-Curve448-SHA-512-Elligator2-Clear
+except HashToCurve is defined to be {#rom} where F is {#elligator2}.
 
 # IANA Considerations
 
@@ -1381,7 +1510,7 @@ is that none of them map injectively to the entire curve, but rather
 some fraction of the points. This makes them unable to use to directly
 construct a random oracle on the curve.
 
-Brier et al. {{SimpleSWU}} proposed a couple of solutions to this problem, The
+Brier et al. {{Br01}} proposed a couple of solutions to this problem, The
 first applies solely to Icart's method described above, by computing F(H0(m))
 + F(H1(m)) for two distinct hash functions H0, H1. The second uses a generator
 G, and computes F(H0(m)) + H1(m)\*G. Later, Farashahi et al. {{FFSTV13}}

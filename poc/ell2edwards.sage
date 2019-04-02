@@ -13,10 +13,8 @@ a = F(-1)
 d = F(-121665/121666)
 a1, a2, a3, a4, a6 = F(0), 2*(a+d)/(a-d), F(0), F(1), F(0)
 E = EllipticCurve(F, [a1, a2, a3, a4, a6])
-A = E.a2()
-B = E.a4()
 ZeroEdw = [F(0),F(1),F(0),F(1)] # (x,y,t,z)
-sA = sqrt(F(-(A+2)))
+sA = sqrt(F(-((2*(a+d)/(a-d))+2)))
 
 h2c_suite = "H2C-Curve25519-SHA512-ELL2-"
 
@@ -76,8 +74,6 @@ def areEqualEdw(P,Q):
        and (y1*z2 == y2*z1)  \
        and (t1*z2 == t2*z1)
 
-
-
 def toAffEdw(P):
     if len(P) == 2:
         x,y = P
@@ -91,25 +87,27 @@ def toAffEdw(P):
 def ell2edwards(alpha):
     u = h2b_from_label(h2c_suite, alpha)
     N = QUAD_NON_RES*u**2
+    C1 = 2*(a+d)/(a-d)
 
-    t1 = -A / (1 + N)
-    t2 = -t1 - A
-    g1 = t1^3 + A*t1^2 + t1
+    t1 = -C1 / (1 + N)
+    t2 = -t1 - C1
+    g1 = t1^3 + C1 * t1^2 + t1
     if is_square(g1):
         t = t1
     else:
         t = t2
-    y = (t-1) / (t+1)
-    x = sq_root((y**2-1)/(d*y**2-a), q)
+    y = (t - 1) / (t + 1)
+    x = sq_root((y**2 - 1) / (d * y**2 - a), q)
     Q = (x, y)
     if isEdwardsPoint(Q):
         return Q
     else:
-        raise Exception("Point not in Edwards curve")
+        raise Exception("Point not in twisted Edwards curve")
 
 # Constants
 c1 = QUAD_NON_RES
-c2 = ZZ( (q-1)/2 )         #Integer Arithmetic
+c2 = 2*(a+d)/(a-d)
+c3 = ZZ( (q-1)/2 )         #Integer Arithmetic
 
 # Implementation
 def ell2edwards_slp(alpha):
@@ -119,28 +117,39 @@ def ell2edwards_slp(alpha):
     t1 = c1 * t1
     t1 = t1 + 1
     t1 = mult_inv(t1, q)
-    t1 = t1 * A
+    t1 = t1 * c2
     t1 = -t1
     tv("t1", t1, 32)
 
-    t2 = -t1 - A
+    t2 = -t1 - c2
     tv("t2", t2, 32)
 
-    g1 = t1 + A
+    g1 = t1 + c2
     g1 = g1 * t1
-    g1 = g1 + B
+    g1 = g1 + 1
     g1 = g1 * t1
     tv("g1", g1, 32)
 
     e = is_QR(g1, q)
-    t = CMOV(t2, t1, e)
-    y = (t-1) / (t+1)
-    x = sq_root((y**2-1)/(d*y**2-a), q)
-    Q = [x, y]
+    t3 = CMOV(t2, t1, e)
+    t4 = t3 + 1
+    t4 = mult_inv(t4, q)
+    y = t3 - 1
+    y = y * t4
+
+    t5 = y**2
+    gx = t5 * d
+    gx = gx - a
+    gx = mult_inv(gx, q)
+    t5 = t5 - 1
+    gx = gx * t5
+    x = sq_root(gx, q)
+
+    Q = (x, y)
     if isEdwardsPoint(Q):
         return Q
     else:
-        raise "Point not in Edwards curve"
+        raise Exception("Point not in twisted Edwards curve")
 
 
 def test_equiv():
