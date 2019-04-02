@@ -99,7 +99,7 @@ normative:
         ins: M. Tibouchi
         name: Mehdi Tibouchi
         org: NTT Secure Platform Laboratories
-  Adj2013:
+  Adj13:
     title: Square Root Computation over Even Extension Fields
     seriesinfo:
         "In": IEEE Transactions on Computers. vol 63 issue 11
@@ -287,6 +287,77 @@ normative:
         ins: B. Vohaska
         name: Brian Vohaska
         org: Ionic Research
+  SC09:
+    title: Fast Hashing to G2 on Pairing-Friendly Curves
+    seriesinfo:
+        "In": Pairing-Based Cryptography - Pairing 2009
+        "pages": 102-113
+        DOI: 10.1007/978-3-642-03298-1_8
+    target: https://doi.org/10.1007/978-3-642-03298-1_8
+    date: 2009
+    author:
+      -
+        ins: M. Scott
+        name: Michael Scott
+        org: School of Computing Dublin City University, Ballymun. Dublin, Ireland.        
+      -
+        ins: N. Benger
+        name: Naomi Benger
+        org: School of Computing Dublin City University, Ballymun. Dublin, Ireland.
+      -
+        ins: M. Charlemagne
+        name: Manuel Charlemagne
+        org: School of Computing Dublin City University, Ballymun. Dublin, Ireland.
+      -
+        ins: L. J. Dominguez Perez
+        name: Luis J. Dominguez Perez
+        org: School of Computing Dublin City University, Ballymun. Dublin, Ireland.
+      -
+        ins: N. Benger
+        name: Naomi Benger
+        org: School of Computing Dublin City University, Ballymun. Dublin, Ireland.
+      -
+        ins: E. J. Kachisa
+        name: Ezekiel J. Kachisa
+        org: School of Computing Dublin City University, Ballymun. Dublin, Ireland.
+  FU11:
+    title: Fast Hashing to G2 on Pairing-Friendly Curves
+    seriesinfo:
+        "In": Selected Areas in Cryptography
+        "pages": 412-430
+        DOI: 10.1007/978-3-642-28496-0_25
+    target: https://doi.org/10.1007/978-3-642-28496-0_25
+    date: 2011
+    author:
+      -
+       ins: L. Fuentes-Castaneda
+       name: Laura Fuentes-Castaneda
+       org: Computer Science Department, CINVESTAV-IPN. Mexico
+      -
+        ins: E. Knapp
+        name: Edward Knapp
+        org: Dept. Combinatorics & Optimization, University of Waterloo, Canada
+      -
+       ins: F. Rodríguez-Henríquez
+       org: Computer Science Department, CINVESTAV-IPN. Mexico
+       name: Francisco Rodríguez-Henríquez
+  BU18:
+    title: Hashing to G2 on BLS pairing-friendly curves
+    seriesinfo:
+        "In": ACM Communications in Computer Algebra
+        "pages": 63-66
+        DOI: 10.1145/3313880.3313884
+    target: https://doi.org/10.1145/3313880.3313884
+    date: Sep, 2018
+    author:
+      -
+       ins: A. Budroni
+       name: Alessandro Budroni
+       org: University of Bergen, Norway and MIRACL Labs, London, England
+      -
+        ins: F. Pintore
+        name: Federico Pintore
+        org: University of Trento, Italy
   Elligator2:
     title: Elligator - elliptic-curve points indistinguishable from uniform random strings
     seriesinfo:
@@ -623,29 +694,6 @@ encoding is distinguishable from a random distribution. Hence, this function is
 not sufficient to get uniformity, but it can be used as a building block as
 described in {{rom}}.
 
-# Algorithm Recommendations {#recommendations}
-
-In practice, two types of mappings are common: (1) Injective encodings, as can be used to
-construct a PRF as F(k, x) = k\*H(x), and (2) Random Oracles, as required by PAKEs {{BMP00}},
-BLS {{BLS01}}, and IBE {{BF01}}. (Some applications, such as IBE, have additional requirements,
-such as a supersingular, pairing-friendly curve.)
-
-The following table lists recommended algorithms for different curves and mappings. To select
-a suitable algorithm, choose the mapping associated with the target curve. For example,
-Elligator2 is the recommended injective encoding function for Curve25519, whereas Simple SWU
-is the recommended injective encoding for P-256. Similarly, the FFSTV Random Oracle construction
-described in {{rom}} composed with Elligator2 should be used for Random Oracle mappings
-to Curve25519. When the required mapping is not clear, applications SHOULD use a Random Oracle.
-
-| Curve | Encoding | Section |
-|-------|----------|---------|
-| P-384      | Icart           | {{icart}}       |
-| P-256      | Simple SWU      | {{simple-swu}}  |
-| Curve25519 | Elligator2      | {{elligator2}}  |
-| Curve448   | Elligator2      | {{elligator2}}  |
-| SECP256K1  | Fouque-Tibouchi | {{ftpairing}}   |
-| BN256      | Fouque-Tibouchi | {{ftpairing}}   |
-
 # Utility Functions {#utility}
 
 Algorithms in this document make use of utility functions described below.
@@ -675,7 +723,7 @@ Algorithms in this document make use of utility functions described below.
     z = z\*sqrt(-1). Finally, sqrt(x, q) := z.
 
   For extension fields, there exist methods that can be used in replacement,
-  see {{Adj2013}}. Regardless the method chosen, the sqrt function should be
+  see {{Adj13}}. Regardless the method chosen, the sqrt function should be
   performed in constant time.
 
 - CMOV(a, b, c): If c=0, CMOV returns a, otherwise returns b. To prevent against
@@ -692,8 +740,8 @@ Algorithms in this document make use of utility functions described below.
 
 # Hashing to a Finite Field {#hashtobase}
 
-The hash2base(x) function maps an arbitrary-large bitstring m into an element
-of a finite field. Hence, it is parametrized by F and H, where H is a
+The hash2base(x) function maps an arbitrary-large bitstring x into an element
+of a field F. Hence, it is parametrized by F and H, where H is a
 cryptographic hash function which outputs at least floor(log2(p)) + 1 bits.
 
 When q=p, the function first hashes x, converts the result to an integer, and
@@ -770,8 +818,10 @@ As a rough style guide the following convention is used:
   as initial value of the encoding.
 
 - t1, t2, ...: are reusable temporary variables. For notable variables,
-  distinct names are used easing the debugging process when correlating with
-  test vectors.
+    distinct names are used easing the debugging process when correlating with
+    test vectors.
+
+- c1, c2, ...: are constant values, which can be computed in advance.
 
 ## Encodings for Weierstrass curves
 
@@ -1304,12 +1354,11 @@ Steps:
 # Random Oracles {#rom}
 
 A random oracle onto an elliptic curve can be instantiated using some
-general constructions. For example, in {{Br01}} was proven a construction
+general constructions. For example, in {{Br01}} it was proven a construction
 for obtaining a random oracle, however it requires a scalar point multiplication
-which is an expensive operation.
-
-A better approach to get uniformity was showed by Farashahi et al. [FFSTV13].
-Such a construction is defined as follows
+which turns hashing into an expensive operation.
+A better approach to get uniformity was given by Farashahi et al. [FFSTV13] and
+is defined as follows
 
 ~~~
    hash2curveRO(alpha) = f(H0(alpha)) + f(H1(alpha))
@@ -1324,90 +1373,58 @@ Using the deterministic encodings from {{encodings}}, the random oracle recommen
 is instantiated as
 
 ~~~
- hash2curveRO(alpha) = hash2curve(alpha || I2OSP(0x02, 1) )
-                     + hash2curve(alpha || I2OSP(0x03, 1) )
+ hash2curveRO(alpha) = map2curve(alpha || I2OSP(0x02, 1) )
+                     + map2curve(alpha || I2OSP(0x03, 1) )
 ~~~
 
 where the addition operation is performed as a point addition on the
 curve.
 
+# Suites for Hashing {#suites}
 
-# Ciphersuites
+The following table lists recommended algorithms for different curves and
+mappings. To select a suitable algorithm, choose the mapping associated with
+the target curve. For example, Elligator2 is the recommended encoding for
+Curve25519, whereas Simple SWU is the recommended encoding for P-256.
+When the required hashing requires to be used in a protocol proven in the
+random oracle model, applications SHOULD use the Random Oracle construction
+given in {{rom}}.
 
-To provide concrete recommendations for algorithms we define a hash-to-curve
-"ciphersuite" as a four-tuple containing:
+A suite is a bundle of algorithms that provides concrete recommendations for
+hashing bitstrings into points of specific elliptic curve groups. Each suite is
+a tuple (E, H, f, ROM) such that
 
-* Destination Group (e.g. P256 or Curve25519)
-* hash2base algorithm
-* HashToCurve algorithm (e.g. SSWU, Icart)
-* (Optional) Transformation (e.g. FFSTV, cofactor clearing)
+* E, is the elliptic curve group.
+* H, is the cryptographic hash function used by hash2base.
+* f, is an encoding function compatible with E.
+* ROM, is a boolean flag indicating whether or not to use the random oracle construction.
 
-A ciphersuite defines an algorithm that takes an arbitrary octet string and
-returns an element of the Destination Group defined in the ciphersuite by applying
-HashToCurve and Transformation (if defined).
+This document describes the following set of ciphersuites
 
-This document describes the following set of ciphersuites:
+| Suite ID | E | H | f | ROM |
+|----------|---|---|---|-----|
+| H2C-0000 | P256         |  SHA256 | Simple SWU | True |
+| H2C-0000 | P384         |  SHA512 | Icart      | True |
+| H2C-0000 | curve25519   |  SHA512 | Elligator2 | True |
+| H2C-0000 | curve448     |  SHA512 | Elligator2 | True |
+| H2C-0000 | edwards25519 |  SHA512 | Elligator2 | True |
+| H2C-0000 | edwards448   |  SHA512 | Elligator2 | True |
+| H2C-0000 | SECP256K1    |  SHA512 | FT         | True |
+| H2C-0000 | BLS12381     |  SHA512 | FT         | True |
 
-* H2C-P256-SHA256-SSWU-
-* H2C-P384-SHA512-Icart-
-* H2C-SECP256K1-SHA512-FT-
-* H2C-BN256-SHA512-FT-
-* H2C-Curve25519-SHA512-Elligator2-Clear
-* H2C-Curve448-SHA512-Elligator2-Clear
-* H2C-Curve25519-SHA512-Elligator2-ROM
-* H2C-Curve448-SHA512-Elligator2-ROM
+## Cofactor multiplication
 
-H2C-P256-SHA256-SSWU- is defined as follows:
+Note that the encodings given above guarantee that the resulting point has
+coordinates satisfying the elliptic curve equation. However, to obtain a point
+in a desired subgroup of the curve, a multiplication by the correspondent
+cofactor must be performed. This is particular to elliptic curve groups of
+non-prime order, for example using Montgomery and Edwards curves.
 
-* The destination group is the set of points on the NIST P-256 elliptic curve, with
-  curve parameters as specified in {{DSS}} (Section D.1.2.3) and
-  {{RFC5114}} (Section 2.6).
-* hash2base is defined as {#hashtobase} with the hash function defined as
-  SHA-256 as specified in {{RFC6234}}, and p set to the prime field used in
-  P-256 (2^256 - 2^224 + 2^192 + 2^96 - 1).
-* HashToCurve is defined to be {#sswu} with A and B taken from the definition of P-256
-  (A=-3, B=41058363725152142129326129780047268409114441015993725554835256314039467401291).
+Similarly, this also applies to pairing-based protocols, which require points
+in particular subgroups, say G1 and G2. There exist efficient techniques to
+multiply points by cofactors to obtain points in G1 and G2 {{SC09}}, {{FU11}},
+{{BU18}}.
 
-H2C-P384-SHA512-Icart- is defined as follows:
-
-* The destination group is the set of points on the NIST P-384 elliptic curve, with
-  curve parameters as specified in {{DSS}} (Section D.1.2.4) and
-  {{RFC5114}} (Section 2.7).
-* hash2base is defined as {#hashtobase} with the hash function defined as
-  SHA-512 as specified in {{RFC6234}}, and p set to the prime field used in
-  P-384 (2^384 - 2^128 - 2^96 + 2^32 - 1).
-* HashToCurve is defined to be {#icart} with A and B taken from the definition of P-384
-  (A=-3, B=27580193559959705877849011840389048093056905856361568521428707301988689241309860865136260764883745107765439761230575).
-
-H2C-Curve25519-SHA512-Elligator2-Clear is defined as follows:
-
-* The destination group is the points on Curve25519, with
-  curve parameters as specified in {{RFC7748}} (Section 4.1).
-* hash2base is defined as {#hashtobase} with the hash function defined as
-  SHA-512 as specified in {{RFC6234}}, and p set to the prime field used in
-  Curve25519 (2^255 - 19).
-* HashToCurve is defined to be {#elligator2} with the curve function defined
-  to be the Montgomery form of Curve25519 (y^2 = x^3 + 486662x^2 + x) and
-  N = 2.
-* The final output is multiplied by the cofactor of Curve25519, 8.
-
-H2C-Curve448-SHA512-Elligator2-Clear is defined as follows:
-
-* The destination group is the points on Curve448, with
-  curve parameters as specified in {{RFC7748}} (Section 4.1).
-* hash2base is defined as {#hashtobase} with the hash function defined as
-  SHA-512 as specified in {{RFC6234}}, and p set to the prime field used in
-  Curve448 (2^448 - 2^224 - 1).
-* HashToCurve is defined to be {#elligator2} with the curve function defined
-  to be the Montgomery form of Curve448 (y^2 = x^3 + 156326x^2 + x) and
-  N = -1.
-* The final output is multiplied by the cofactor of Curve448, 4.
-
-H2C-Curve25519-SHA512-Elligator2-ROM is defined as in H2C-Curve25519-SHA-512-Elligator2-Clear
-except HashToCurve is defined to be {#rom} where F is {#elligator2}.
-
-H2C-Curve448-SHA512-Elligator2-ROM is defined as in H2C-Curve448-SHA-512-Elligator2-Clear
-except HashToCurve is defined to be {#rom} where F is {#elligator2}.
 
 # IANA Considerations
 
@@ -1447,7 +1464,7 @@ earlier versions of this document.
 In this chapter, we  give a background to some common methods to encode or
 hash to the curve, motivated by the similar exposition in {{Icart09}}.
 Understanding of this material is not required in order to choose a
-suitable encoding function - we defer this to {{recommendations}}
+suitable encoding function - we defer this to {{suites}}
  - the background covered here can work as a template for analyzing encoding
 functions not found in this document, and as a guide for further research
 into the topics covered.
@@ -1517,23 +1534,6 @@ G, and computes F(H0(m)) + H1(m)\*G. Later, Farashahi et al. {{FFSTV13}}
 showed the generality of the F(H0(m)) + F(H1(m)) method, as well as the
 applicability to hyperelliptic curves (not covered here).
 
-## Supersingular Curves
-
-For supersingular curves, for every y in GF(p) (with p>3), there exists a value
-x such that (x, y) is on the curve E. Hence we can construct a bijection
-F : GF(p) -> E (ignoring the point at infinity). This is the case for
-{{BF01}}, but is not common.
-
-## Twisted Variants
-
-We can also consider curves which have twisted variants, E^d. For such curves,
-for any x in GF(p), there exists y in GF(p) such that (x, y) is either a point
-on E or E^d. Hence one can construct a bijection F : GF(p) x {0,1} -> E union E^d,
-where the extra bit is needed to choose the sign of the point. This can be
-particularly useful for constructions which only need the x-coordinate of the
-point. For example, x-only scalar multiplication can be computed on Montgomery
-curves. In this case, there is no need for an encoding function, since the output
-of F in GF(p) is sufficient to define a point on one of E or E^d.
 
 # Try-and-Increment Method {#try}
 
