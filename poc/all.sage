@@ -1,4 +1,3 @@
-load("primes.sage")
 
 Hex = lambda x: map(hex,map(int,x))
 

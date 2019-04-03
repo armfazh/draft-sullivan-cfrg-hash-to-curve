@@ -39,12 +39,8 @@ author:
 
 normative:
   RFC2119:
-  RFC5114:
-  RFC5869:
-  RFC6234:
   RFC7748:
   RFC8017:
-  RFC8032:
   SECG1:
     title: "SEC 1: Elliptic Curve Cryptography"
     target: http://www.secg.org/sec1-v2.pdf
@@ -59,16 +55,6 @@ normative:
     author:
       -
         org: Standards for Efficient Cryptography Group (SECG)
-  DSS:
-    title: Digital Signature Standard (DSS)
-    seriesinfo:
-        "In": FIPS PUB 186-4
-        DOI: 10.6028/NIST.FIPS.186-4
-    target: https://doi.org/10.6028/NIST.FIPS.186-4
-    date: July, 2013
-    author:
-      -
-        org: National Institute for Standards and Technology
   Icart09:
     title: How to Hash into Elliptic Curves
     seriesinfo:
@@ -260,33 +246,6 @@ normative:
         ins: A. Langley
         name: Adam Langley
     date: 2013
-  ECOPRF:
-    title: EC-OPRF - Oblivious Pseudorandom Functions using Elliptic Curves
-    seriesinfo:
-        "In": Cryptology ePrint archive vol 2017 issue 111
-    target: https://eprint.iacr.org/2017/111
-    date: 2017
-    author:
-      -
-        ins: J. Burns
-        name: Jonathan Burns
-        org: Ionic Research
-      -
-        ins: D. Moore
-        name: Daniel Moore
-        org: Ionic Research
-      -
-        ins: K. Ray
-        name: Katrina Ray
-        org: Ionic Research
-      -
-        ins: R. Speers
-        name: Ryan Speers
-        org: Ionic Research
-      -
-        ins: B. Vohaska
-        name: Brian Vohaska
-        org: Ionic Research
   SC09:
     title: Fast Hashing to G2 on Pairing-Friendly Curves
     seriesinfo:
@@ -437,7 +396,7 @@ normative:
         ins: M. Ulas
         name: Maciej Ulas
         org: Institute of Mathematics, Jagiellonian University. Poland
-  Br01:
+  BR01:
     title: Efficient Indifferentiable Hashing into Ordinary Elliptic Curves
     seriesinfo:
         "In": Advances in Cryptology - CRYPTO 2010
@@ -499,7 +458,7 @@ normative:
         ins: J. F. Voloch
         name: J. Felipe Voloch
         org: University of Texas
-  Schoof85:
+  SC85:
     title: Elliptic Curves Over Finite Fields and the Computation of Square Roots mod p
     seriesinfo:
         "In": Mathematics of Computation vol 44 issue 170
@@ -511,40 +470,6 @@ normative:
       -
         ins: R. Schoof
         name: Rene Schoof
-  BL07:
-    title: Faster addition and doubling on elliptic curves
-    seriesinfo:
-        "In": Advances in Cryptology - ASIACRYPT 2007
-        "pages": 29-50
-        DOI: 10.1007/978-3-540-76900-2_3
-    target: https://doi.org/10.1007/978-3-540-76900-2_3
-    date: 2007
-    author:
-      -
-        ins: D. J. Bernstein
-        name: Daniel J. Bernstein
-        org: Department of Computer Science, University of Illinois at Chicago, USA
-      -
-        ins: T. Lange
-        name: Tanja Lange
-        org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
-  BL17:
-    title: Montgomery curves and the Montgomery ladder
-    seriesinfo:
-        "In": Topics in Computational Number Theory Inspired by Peter L. Montgomery
-        "pages": 82-115
-        DOI: 10.1017/9781316271575.005
-    target: https://doi.org/10.1017/9781316271575.005
-    date: Oct, 2017
-    author:
-      -
-        ins: D. J. Bernstein
-        name: Daniel J. Bernstein
-        org: Department of Computer Science, University of Illinois at Chicago, USA
-      -
-        ins: T. Lange
-        name: Tanja Lange
-        org: Department of Mathematics and Computer Science, Technische Universiteit Eindhoven, The Netherlands
   github-repo:
     title: draft-irtf-cfrg-hash-to-curve | github.com
     target: https://github.com/chris-wood/draft-irtf-cfrg-hash-to-curve
@@ -723,8 +648,8 @@ Algorithms in this document make use of utility functions described below.
     z = z\*sqrt(-1). Finally, sqrt(x, q) := z.
 
   For extension fields, there exist methods that can be used in replacement,
-  see {{Adj13}}. Regardless the method chosen, the sqrt function should be
-  performed in constant time.
+  see {{Adj13}}, {{SC85}}. Regardless the method chosen, the sqrt function
+  should be performed in constant time.
 
 - CMOV(a, b, c): If c=0, CMOV returns a, otherwise returns b. To prevent against
   timing attacks, this operation must run in constant time without revealing the
@@ -973,7 +898,7 @@ Steps:
 ### Simplified SWU Method {#simple-swu}
 
 The map2curve_simple_swu(alpha) implements a simplified version of
-Shallue-Woestijne-Ulas algorithm given by Brier et al. {{Br01}}.
+Shallue-Woestijne-Ulas algorithm given by Brier et al. {{BR01}}.
 
 Preconditions: A Weierstrass curve over F such that A!=0, B!=0, and p=3 (mod 4).
 
@@ -1354,7 +1279,7 @@ Steps:
 # Random Oracles {#rom}
 
 A random oracle onto an elliptic curve can be instantiated using some
-general constructions. For example, in {{Br01}} it was proven a construction
+general constructions. For example, in {{BR01}} it was proven a construction
 for obtaining a random oracle, however it requires a scalar point multiplication
 which turns hashing into an expensive operation.
 A better approach to get uniformity was given by Farashahi et al. [FFSTV13] and
@@ -1527,7 +1452,7 @@ is that none of them map injectively to the entire curve, but rather
 some fraction of the points. This makes them unable to use to directly
 construct a random oracle on the curve.
 
-Brier et al. {{Br01}} proposed a couple of solutions to this problem, The
+Brier et al. {{BR01}} proposed a couple of solutions to this problem, The
 first applies solely to Icart's method described above, by computing F(H0(m))
 + F(H1(m)) for two distinct hash functions H0, H1. The second uses a generator
 G, and computes F(H0(m)) + H1(m)\*G. Later, Farashahi et al. {{FFSTV13}}
