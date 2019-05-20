@@ -97,7 +97,7 @@ def toAffineEdwards(P):
         x,y = P
         t = x*y
         z = 1
-    elif len(p) == 4:
+    elif len(P) == 4:
         x,y,t,z = P
     return (x/z,y/z,t*z,1)
 
